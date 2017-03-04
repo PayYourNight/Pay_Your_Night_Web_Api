@@ -5,11 +5,11 @@
     .module('equipes')
     .run(menuConfig);
 
-  menuConfig.$inject = ['menuService'];
+  menuConfig.$inject = ['Menus'];
 
-  function menuConfig(menuService) {
+  function menuConfig(Menus) {
     // Set top bar menu items
-    menuService.addMenuItem('topbar', {
+      Menus.addMenuItem('topbar', {
       title: 'Equipes',
       state: 'equipes',
       type: 'dropdown',
@@ -17,13 +17,13 @@
     });
 
     // Add the dropdown list item
-    menuService.addSubMenuItem('topbar', 'equipes', {
+      Menus.addSubMenuItem('topbar', 'equipes', {
       title: 'List Equipes',
       state: 'equipes.list'
     });
 
     // Add the dropdown create item
-    menuService.addSubMenuItem('topbar', 'equipes', {
+      Menus.addSubMenuItem('topbar', 'equipes', {
       title: 'Create Equipe',
       state: 'equipes.create',
       roles: ['user']

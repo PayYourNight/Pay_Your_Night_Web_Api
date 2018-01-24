@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use strict';
 
 /**
@@ -13,7 +14,7 @@ var should = require('should'),
     Checkin = mongoose.model('Checkin'),
     Consumo = mongoose.model('Consumo');
 Produto = mongoose.model('Produto');
-
+produtoConsumo = mongoose.model('ProdutoConsumo');
 
 /**
  * Globals
@@ -28,12 +29,19 @@ var user,
     produto1,
     produto2;
 
-/**
- * Unit tests
- */
+var _user,
+    _meioPagamento,
+    _estabelecimento,
+    _usuarioCaixa,
+    _checkin,
+    _produto1,
+    _produto2,
+    _consumo,
+    _produtoConsumo;
+
 describe('Pagamento Model Unit Tests:', function() {
     before(function() {
-        user = new User({
+        user = {
             firstName: 'Full',
             lastName: 'Name',
             displayName: 'Full Name',
@@ -41,23 +49,23 @@ describe('Pagamento Model Unit Tests:', function() {
             username: 'username',
             password: 'password',
             role: ['user']
-        });
+        };
 
-        meioPagamento = new MeioPagamento({
+        meioPagamento = {
             usuario: user,
             tipoMeioPagamento: ['credito'],
             numero: '123456789101112',
             vencimentoDia: '09',
             vencimentoAno: '22',
             codigoSeguranca: '082'
-        });
+        };
 
-        estabelecimento = new Estabelecimento({
+        estabelecimento = {
             nome: 'Estabelecimento01',
             cnpj: '80421067000139'
-        });
+        };
 
-        usuarioCaixa = new User({
+        usuarioCaixa = {
             firstName: 'Full',
             lastName: 'Name Caixa',
             displayName: 'Full Caixa',
@@ -66,55 +74,119 @@ describe('Pagamento Model Unit Tests:', function() {
             password: '123456',
             estabelecimento: estabelecimento,
             role: ['caixa']
-        });
+        };
 
-        checkin = new Checkin({
+        checkin = new {
             usuario: user,
             estabelecimento: estabelecimento,
             transactionId: '5307bcd7cb1ec6fc42eac7ad74a5d6f6'
-        });
+        };
 
-        produto1 = new Produto({
+        produto1 = new {
             descricao: 'Cerveja Heineken 600'
-        });
+        };
 
-        produto2 = new Produto({
+        produto2 = new {
             descricao: 'Cerveja Brahma Longneck'
-        });
+        };
 
-        produtoConsumo = new produtoConsumo({
+        consumo = new {
+            checkin: checkin,
+            transactionId: 'f0927c99593798912cb18c6c0e56ded8',
+        };
+
+        produtoConsumo = {
             consumo: consumo,
             valorAplicado: 10,
             produto: produto1,
             status: 'atendido'
-        });
+        };
 
-        consumo = new Consumo({
-            checkin: checkin,
-            transactionId: 'f0927c99593798912cb18c6c0e56ded8',
+        produtoConsumo = {
+            consumo: consumo,
+            valorAplicado: 12,
+            produto: produto2,
             status: 'atendido'
-        });
-
+        };
     });
 
     beforeEach(function(done) {
-        usuario.save(function() {
-            done();
-        });
+        _user = new User(user);
+        _user.save();
+
+        _meioPagamento = new MeioPagamento(meioPagamento);
+        _meioPagamento.user = _user;
+        _meio.save();
+
+        _estabelecimento = new Estabelecimento(estabelecimento);
+        _estabelecimento.save();
+
+        _usuarioCaixa = new User(usuarioCaixa);
+        _usuarioCaixa.estabelecimento = _estabelecimento;
+        _usuarioCaixa.save();
+
+        _checkin = new Checkin(checkin);
+        _checkin.usuario = _user;
+        _checkin.estabelecimento = _estabelecimento;
+        _checkin.save();
+
+        _produto1 = new Produto(produto1);
+        _produto1.save();
+
+        _produto2 = new Produto(produto2);
+        _produto2.save();
+
+        _consumo = new Consumo(consumo);
+        _consumo.checkin = _checkin;
+        _consumo.save();
+
+        _produtoConsumo = new ProdutoConsumo(produtoConsumo);
+        _produtoConsumo.consumo = _consumo;
+        _produtoConsumo.produto = _produto1;
+        _produtoConsumo.save();
+
+        _produtoConsumo = new ProdutoConsumo(produtoConsumo);
+        _produtoConsumo.consumo = _consumo;
+        _produtoConsumo.produto = _produto1;
+        _produtoConsumo.save();
+
+        done();
     });
 
     describe('Method Save', function() {
-        it('should be able to save without problems', function(done) {
-            return pagamento.save(function(err) {
+        it('deve ser capaz de realizar o pagemento pelo aplicativo com cartao de credito sem problemas.', function(done) {
+
+            pagamento = new Pagamento();
+            pagamento.usuario = _user;
+            pagamento.estabelecimento = _estabelecimento;
+            pagamento.consumo = _consumo;
+            pagamento.meioPagamento = _meioPagamento;
+            pagamento.discriminator = ['pagamentoApp'];
+            pagamento.formaPagamento = ['credito'];
+            pagamento.valorTotal = 20;
+
+            pagamento.save(function(err) {
                 should.not.exist(err);
-                done();
+                pagamento.remove(function(err) {
+                    should.not.exist(err);
+                    done();
+                });
             });
         });
     });
 
     afterEach(function(done) {
         Pagamento.remove().exec();
-        Usuario.remove().exec();
+        user.remove().exec();
+        meioPagamento.remove().exec();
+        estabelecimento.remove().exec();
+        usuarioCaixa.remove().exec();
+        checkin.remove().exec();
+        produto1.remove().exec();
+        produto2.remove().exec();
+        produtoConsumo.remove().exec();
+        produtoConsumo.remove().exec();
+        pagamento.remove().exec();
 
         done();
     });

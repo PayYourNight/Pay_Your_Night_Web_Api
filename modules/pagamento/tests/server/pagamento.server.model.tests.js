@@ -29,15 +29,15 @@ var user,
     produto1,
     produto2;
 
-var _user,
-    _meioPagamento,
-    _estabelecimento,
-    _usuarioCaixa,
-    _checkin,
-    _produto1,
-    _produto2,
-    _consumo,
-    _produtoConsumo;
+// var _user,
+//     _meioPagamento,
+//     _estabelecimento,
+//     _usuarioCaixa,
+//     _checkin,
+//     _produto1,
+//     _produto2,
+//     _consumo,
+//     _produtoConsumo;
 
 describe('Pagamento Model Unit Tests:', function() {
     before(function() {
@@ -111,41 +111,41 @@ describe('Pagamento Model Unit Tests:', function() {
     });
 
     beforeEach(function(done) {
-        _user = new User(user);
+        var _user = new User(user);
         _user.save();
 
-        _meioPagamento = new MeioPagamento(meioPagamento);
+        var _meioPagamento = new MeioPagamento(meioPagamento);
         _meioPagamento.user = _user;
         _meio.save();
 
-        _estabelecimento = new Estabelecimento(estabelecimento);
+        var _estabelecimento = new Estabelecimento(estabelecimento);
         _estabelecimento.save();
 
-        _usuarioCaixa = new User(usuarioCaixa);
+        var _usuarioCaixa = new User(usuarioCaixa);
         _usuarioCaixa.estabelecimento = _estabelecimento;
         _usuarioCaixa.save();
 
-        _checkin = new Checkin(checkin);
+        var _checkin = new Checkin(checkin);
         _checkin.usuario = _user;
         _checkin.estabelecimento = _estabelecimento;
         _checkin.save();
 
-        _produto1 = new Produto(produto1);
+        var _produto1 = new Produto(produto1);
         _produto1.save();
 
-        _produto2 = new Produto(produto2);
+        var _produto2 = new Produto(produto2);
         _produto2.save();
 
-        _consumo = new Consumo(consumo);
+        var _consumo = new Consumo(consumo);
         _consumo.checkin = _checkin;
         _consumo.save();
 
-        _produtoConsumo = new ProdutoConsumo(produtoConsumo);
+        var _produtoConsumo = new ProdutoConsumo(produtoConsumo);
         _produtoConsumo.consumo = _consumo;
         _produtoConsumo.produto = _produto1;
         _produtoConsumo.save();
 
-        _produtoConsumo = new ProdutoConsumo(produtoConsumo);
+        var _produtoConsumo = new ProdutoConsumo(produtoConsumo);
         _produtoConsumo.consumo = _consumo;
         _produtoConsumo.produto = _produto1;
         _produtoConsumo.save();

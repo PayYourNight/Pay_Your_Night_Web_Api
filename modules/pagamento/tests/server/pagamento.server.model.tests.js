@@ -13,8 +13,8 @@ var should = require('should'),
     Produto = mongoose.model('Produto'),
     Checkin = mongoose.model('Checkin'),
     Consumo = mongoose.model('Consumo');
-Produto = mongoose.model('Produto');
-produtoConsumo = mongoose.model('ProdutoConsumo');
+    Produto = mongoose.model('Produto');
+    produtoConsumo = mongoose.model('ProdutoConsumo');
 
 /**
  * Globals
@@ -28,16 +28,6 @@ var user,
     checkin,
     produto1,
     produto2;
-
-// var _user,
-//     _meioPagamento,
-//     _estabelecimento,
-//     _usuarioCaixa,
-//     _checkin,
-//     _produto1,
-//     _produto2,
-//     _consumo,
-//     _produtoConsumo;
 
 describe('Pagamento Model Unit Tests:', function() {
     before(function() {

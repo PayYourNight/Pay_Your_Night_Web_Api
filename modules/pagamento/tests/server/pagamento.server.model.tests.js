@@ -10,11 +10,11 @@ var should = require('should'),
     Pagamento = mongoose.model('Pagamento'),
     Estabelecimento = mongoose.model('Estabeleciento'),
     MeioPagamento = mongoose.model('MeioPagamento'),
-    Produto = mongoose.model('Produto');
-    // Checkin = mongoose.model('Checkin'),
-    // Consumo = mongoose.model('Consumo');
-    // Produto = mongoose.model('Produto');
-    // produtoConsumo = mongoose.model('ProdutoConsumo');
+    Produto = mongoose.model('Produto'),
+    Checkin = mongoose.model('Checkin'),
+    Consumo = mongoose.model('Consumo'),
+    Produto = mongoose.model('Produto'),
+    produtoConsumo = mongoose.model('ProdutoConsumo');
 
 /**
  * Globals
@@ -88,6 +88,7 @@ describe('Pagamento Model Unit Tests:', function() {
         produtoConsumo = {
             consumo: consumo,
             valorAplicado: 10,
+            quantidade: 1,
             produto: produto1,
             status: 'atendido'
         };

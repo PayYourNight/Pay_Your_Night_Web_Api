@@ -10,11 +10,11 @@ var should = require('should'),
     Pagamento = mongoose.model('Pagamento'),
     Estabelecimento = mongoose.model('Estabeleciento'),
     MeioPagamento = mongoose.model('MeioPagamento'),
-    Produto = mongoose.model('Produto'),
-    Checkin = mongoose.model('Checkin'),
-    Consumo = mongoose.model('Consumo');
     Produto = mongoose.model('Produto');
-    produtoConsumo = mongoose.model('ProdutoConsumo');
+    // Checkin = mongoose.model('Checkin'),
+    // Consumo = mongoose.model('Consumo');
+    // Produto = mongoose.model('Produto');
+    // produtoConsumo = mongoose.model('ProdutoConsumo');
 
 /**
  * Globals

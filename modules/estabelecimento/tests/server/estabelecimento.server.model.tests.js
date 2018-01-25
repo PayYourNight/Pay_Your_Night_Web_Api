@@ -7,69 +7,49 @@ var should = require('should'),
 
 var estabelecimento;
 
-describe('Estabelecimento Model Unit Tests:', function() {
-    beforeEach(function(done) {
+describe('Estabelecimento Model Unit Tests:', function () {
+  beforeEach(function (done) {
 
-        estabelecimento = new Estabelecimento({
-            nome: 'Estabelecimento 01',
-            cnpj: '12646096000149'
-        });
-
-        //user = new User({
-        //  firstName: 'Full',
-        //  lastName: 'Name',
-        //  displayName: 'Full Name',
-        //  email: 'test@test.com',
-        //  username: 'username',
-        //  password: 'password'
-        //});
-
-        //user.save(function() {
-        //  estabelecimento = new Estabelecimento({
-        //    // Add model fields
-        //    // ...
-        //  });
-
-        //  done();
-        //});
+    estabelecimento = new Estabelecimento({
+      nome: 'Estabelecimento 01',
+      cnpj: '12646096000149'
     });
 
-    describe('Método Salvar', function() {
-        it('deve ser capaz de cadastrar um estabelecimento sem falhas', function(done) {
-            return estabelecimento.save(function(err) {
-                should.not.exist(err);
-                done();
-            });
-        });
+    done();
+  });
+
+  describe('Método Salvar', function () {
+    it('Deve ser capaz de cadastrar um estabelecimento sem falhas', function (done) {
+      
+      estabelecimento.save(function (err) {
+        should.not.exist(err);
+        return done();
+      });
     });
 
-    describe('Método Salvar', function() {
-        it('Nãoo deve ser capaz de cadastrar um Estabelecimento sem o nome', function(done) {
+    it('Não deve ser capaz de cadastrar um Estabelecimento sem o nome', function (done) {
+      
+      estabelecimento.nome = '';
 
-            estabelecimento.nome = '';
-
-            return estabelecimento.save(function(err) {
-                should.exist(err);
-                done();
-            });
-        });
+      estabelecimento.save(function (err) {
+        should.exist(err);
+        return done();
+      });
     });
 
-    describe('Método Salvar', function() {
-        it('Nãoo deve ser capaz de cadastrar um Estabelecimento sem o CNPJ', function(done) {
+    it('Não deve ser capaz de cadastrar um Estabelecimento sem o CNPJ', function (done) {
 
-            estabelecimento.cnpj = '';
+      estabelecimento.cnpj = '';
 
-            return estabelecimento.save(function(err) {
-                should.exist(err);
-                done();
-            });
-        });
+      estabelecimento.save(function (err) {
+        should.exist(err);
+        return done();
+      });
     });
+  });
 
-
-    afterEach(function(done) {
-        Estabelecimento.remove().exec();
-        done();
-    });
+  afterEach(function (done) {
+    Estabelecimento.remove().exec();
+    done();
+  });
 });

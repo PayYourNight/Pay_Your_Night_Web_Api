@@ -1,14 +1,8 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
-/**
- * MeioPagamento Schema
- */
 var MeioPagamentoSchema = new Schema({
   created: {
     type: Date,
@@ -26,16 +20,20 @@ var MeioPagamentoSchema = new Schema({
     default: ['credito']
   },
   numero: {
-    type: String
+    type: Number,
+    required: 'O número do cartão deve ser informado',
   },
   vencimentoDia: {
-    type: String
+    type: String,
+    required: 'O dia do vencimento deve ser informado',
   },
   vencimentoAno: {
-    type: String
+    type: String,
+    required: 'O ano do vencimento deve ser informado',
   },
   codigoSeguranca: {
-    type: String
+    type: String,
+    required: 'O código de segurança deve ser informado',
   }
 });
 

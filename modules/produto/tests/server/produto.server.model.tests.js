@@ -1,56 +1,47 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
 var should = require('should'),
   mongoose = require('mongoose'),
-  User = mongoose.model('User'),
+  Estabelecimento = mongoose.model('Estabelecimento'),
   Produto = mongoose.model('Produto');
 
-/**
- * Globals
- */
-var user,
+var estabelecimento,
   produto;
 
-/**
- * Unit tests
- */
 describe('Produto Model Unit Tests:', function() {
   beforeEach(function(done) {
-    user = new User({
-      firstName: 'Full',
-      lastName: 'Name',
-      displayName: 'Full Name',
-      email: 'test@test.com',
-      username: 'username',
-      password: 'password'
+
+    estabelecimento = new Estabelecimento({
+      nome: 'estabelecimento 1',
+      cnpj: '12345678901213'
     });
 
-    user.save(function() {
+    estabelecimento.save()
+    .then(function() {
       produto = new Produto({
-        // Add model fields
-        // ...
+        estabelecimento: estabelecimento,
+        descricao: 'Heineken 600',
+        valor: 10
       });
 
       done();
-    });
+    })
+    .catch(done);
   });
 
-  describe('Method Save', function() {
-    it('should be able to save without problems', function(done) {
-      return produto.save(function(err) {
+  describe('Método Salvar', function() {
+    it('Deve ser capaz de salvar sem problemas', function(done) {
+      produto.save(function(err) {
         should.not.exist(err);
-        done();
+        return done();
       });
     });
   });
 
   afterEach(function(done) {
-    Produto.remove().exec();
-    User.remove().exec();
-
-    done();
+    Produto.remove().exec()
+    .then(Estabelecimento.remove().exec())
+    .then(done())
+    .catch(done);
   });
 });

@@ -39,7 +39,7 @@ var PagamentoSchema = new Schema({
   formaPagamento: {
     type: [{
       type: String,
-      enum: ['dinheiro', 'cridito', 'debito', 'paypal']
+      enum: ['dinheiro', 'credito', 'debito', 'paypal']
     }],
     default: ['credito']
   },

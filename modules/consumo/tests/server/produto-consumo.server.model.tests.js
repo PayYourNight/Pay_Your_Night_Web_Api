@@ -82,8 +82,9 @@ describe('Produto Consumo Model Unit Tests:', function() {
     });
 
     afterEach(function(done) {
-        ProdutoConsumo.remove().exec()
+        ProdutoConsumo.remove().exec()            
             .then(Produto.remove().exec())
+            .then(Consumo.remove().exec())
             .then(Checkin.remove().exec())
             .then(Estabelecimento.remove().exec())
             .then(User.remove().exec())

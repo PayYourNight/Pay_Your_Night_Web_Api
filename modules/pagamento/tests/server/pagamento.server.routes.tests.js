@@ -4,6 +4,7 @@ var should = require('should'),
   request = require('supertest'),
   path = require('path'),
   mongoose = require('mongoose'),
+  express = require(path.resolve('./config/lib/express')),
   User = mongoose.model('User'),
   UserCaixa = mongoose.model('User'),
   MeioPagamento = mongoose.model('MeioPagamento'),
@@ -13,20 +14,20 @@ var should = require('should'),
   Produto = mongoose.model('Produto'),
   ProdutoConsumo = mongoose.model('ProdutoConsumo'),
   Pagamento = mongoose.model('Pagamento');
-  express = require(path.resolve('./config/lib/express'));
-
-/**
- * Globals
- */
+  
 var app,
-  agent,
-  credentials,
-  user,
-  article;
+    agent,
+    credentials,
+    user,
+    userCaixa,
+    meioPagamento,
+    estabelecimento,
+    checkin,
+    consumo,
+    produto,
+    produtoConsumo,
+    pagamento;
 
-/**
- * Article routes tests
- */
 describe('Pagamento Server Routes tests', function () {
 
   before(function (done) {
@@ -196,8 +197,8 @@ describe('Pagamento Server Routes tests', function () {
       // Request articles
       agent.get('/api/pagamentos')
         .end(function (req, res) {
-          // Set assertion
-          res.body.should.be.instanceof(Array).and.have.lengthOf(1);
+          // Set assertion          
+          res.body.message.should.be.equal('User is not authorized');
 
           // Call the assertion callback
           done();
@@ -206,24 +207,41 @@ describe('Pagamento Server Routes tests', function () {
     });
   });
 
-  //it('should be able to get a single article if not signed in', function (done) {
-  //  // Create new article model instance
-  //  var articleObj = new Article(article);
+  it('Não deve ser capaz de salvar um pagamento com login de administrador', function(){
 
-  //  // Save the article
-  //  articleObj.save(function () {
-  //    agent.get('/api/articles/' + articleObj._id)
-  //      .end(function (req, res) {
-  //        // Set assertion
-  //        res.body.should.be.instanceof(Object).and.have.property('title', article.title);
+  });
 
-  //        // Call the assertion callback
-  //        done();
-  //      });
-  //  });
-  //});
+  it('Deve ser capaz de salvar um pagamento com login de usuario', function(){
 
-  it('should return proper error for single article with an invalid Id, if not signed in', function (done) {
+  });
+
+  it('deve ser capaz de retornar uma lista de pagamentos com login de administrador', function(){
+
+  });
+
+  it('Não deve ser capaz de retorar um pagamento onde o usuário não é o prorietário', function(){
+
+  });
+
+
+/*  it('should be able to get a single article if not signed in', function (done) {
+   // Create new article model instance
+   var articleObj = new Article(article);
+
+   // Save the article
+   articleObj.save(function () {
+     agent.get('/api/articles/' + articleObj._id)
+       .end(function (req, res) {
+         // Set assertion
+         res.body.should.be.instanceof(Object).and.have.property('title', article.title);
+
+         // Call the assertion callback
+         done();
+       });
+   });
+  });*/
+
+/*  it('should return proper error for single article with an invalid Id, if not signed in', function (done) {
     // test is not a valid mongoose Id
     agent.get('/api/articles/test')
       .end(function (req, res) {
@@ -233,9 +251,9 @@ describe('Pagamento Server Routes tests', function () {
         // Call the assertion callback
         done();
       });
-  });
+  });*/
 
-  it('should return proper error for single article which doesnt exist, if not signed in', function (done) {
+/*  it('should return proper error for single article which doesnt exist, if not signed in', function (done) {
     // This is a valid mongoose Id but a non-existent article
     agent.get('/api/articles/559e9cd815f80b4c256a8f41')
       .end(function (req, res) {
@@ -246,8 +264,8 @@ describe('Pagamento Server Routes tests', function () {
         done();
       });
   });
-
-  it('should not be able to delete an article if signed in without the "admin" role', function (done) {
+*/
+/*  it('should not be able to delete an article if signed in without the "admin" role', function (done) {
     agent.post('/api/auth/signin')
       .send(credentials)
       .expect(200)
@@ -265,9 +283,9 @@ describe('Pagamento Server Routes tests', function () {
             done(articleSaveErr);
           });
       });
-  });
+  });*/
 
-  it('should not be able to delete an article if not signed in', function (done) {
+/*  it('should not be able to delete an article if not signed in', function (done) {
     // Set article user
     article.user = user;
 
@@ -288,9 +306,9 @@ describe('Pagamento Server Routes tests', function () {
         });
 
     });
-  });
+  });*/
 
-  it('should be able to get a single article that has an orphaned user reference', function (done) {
+/*  it('should be able to get a single article that has an orphaned user reference', function (done) {
     // Create orphan user creds
     var _creds = {
       usernameOrEmail: 'orphan',
@@ -376,9 +394,9 @@ describe('Pagamento Server Routes tests', function () {
             });
         });
     });
-  });
+  });*/
 
-  it('should be able to get a single article if not signed in and verify the custom "isCurrentUserOwner" field is set to "false"', function (done) {
+/*  it('should be able to get a single article if not signed in and verify the custom "isCurrentUserOwner" field is set to "false"', function (done) {
     // Create new article model instance
     var articleObj = new Article(article);
 
@@ -397,9 +415,9 @@ describe('Pagamento Server Routes tests', function () {
           done();
         });
     });
-  });
+  });*/
 
-  it('should be able to get single article, that a different user created, if logged in & verify the "isCurrentUserOwner" field is set to "false"', function (done) {
+/*  it('should be able to get single article, that a different user created, if logged in & verify the "isCurrentUserOwner" field is set to "false"', function (done) {
     // Create temporary user creds
     var _creds = {
       usernameOrEmail: 'articleowner',
@@ -484,12 +502,19 @@ describe('Pagamento Server Routes tests', function () {
             });
         });
     });
-  });
+  });*/
 
-  afterEach(function (done) {
-    Article.remove().exec()
-      .then(User.remove().exec())
-      .then(done())
-      .catch(done);
-  });
+    afterEach(function(done) {
+        Pagamento.remove().exec()
+            .then(ProdutoConsumo.remove().exec())
+            .then(UserCaixa.remove().exec())
+            .then(ProdutoConsumo.remove().exec())
+            .then(Produto.remove().exec())
+            .then(Consumo.remove().exec())
+            .then(Checkin.remove().exec())
+            .then(Estabelecimento.remove().exec())
+            .then(User.remove().exec())
+            .then(done())
+            .catch(done);
+    });
 });

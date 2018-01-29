@@ -19,5 +19,5 @@ module.exports = function(app) {
     //.delete(articles.delete);
 
   // Finish by binding the article middleware
-  app.param('pagamentoId', articles.pagamentoByID);
+  app.param('pagamentoId', pagamentos.pagamentoByID);
 };

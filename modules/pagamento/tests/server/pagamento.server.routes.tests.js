@@ -162,8 +162,7 @@ describe('Pagamento Server Routes tests', function () {
     agent.post('/api/pagamentos')
       .send(pagamento)
       .expect(403)
-      .end(function (pagamentoSaveErr, pagamentoSaveRes) {
-        // Call the assertion callback
+      .end(function (pagamentoSaveErr, pagamentoSaveRes) {      
         done(pagamentoSaveErr);
       });
   });
@@ -188,39 +187,99 @@ describe('Pagamento Server Routes tests', function () {
   //    });
   //});
 
-  it('Não deve ser capaz de retornar uma lista de pagamentos se não estiver logado', function (done) {
-    // Create new article model instance
+  it('Não deve ser capaz de retornar uma lista de pagamentos se não estiver logado', function (done) {    
     var pagamentoObj = new Pagamento(pagamento);
-
-    // Save the article
-    pagamentoObj.save(function () {
-      // Request articles
+    
+    pagamentoObj.save(function () {      
       agent.get('/api/pagamentos')
-        .end(function (req, res) {
-          // Set assertion          
+        .end(function (req, res) {                  
           res.body.message.should.be.equal('User is not authorized');
-
-          // Call the assertion callback
+          
           done();
         });
-
     });
   });
 
-  it('Não deve ser capaz de salvar um pagamento com login de administrador', function(){
+  it('Não deve ser capaz de salvar um pagamento com login de administrador', function(done){
+    var _creds = {
+      usernameOrEmail: 'new',
+      password: 'M3@n.jsI$Aw3$0m3'
+    };
 
+    // Create orphan user
+    var _user = new User({
+      firstName: 'Full',
+      lastName: 'Name',
+      displayName: 'Full Name',
+      email: 'orphan@test.com',
+      username: _creds.usernameOrEmail,
+      password: _creds.password,
+      provider: 'local',
+      roles: ['admin']
+    });
+
+
+    _user.save(function(err, user){
+      if (err) {
+        return done(err);
+      }
+
+      agent.post('/api/auth/signin')
+      .send(_creds)
+      .expect(200)
+      .end(function (signinErr, signinRes) {
+
+        if (signinErr) {
+          return done(signinErr);
+        }
+
+        agent.post('/api/pagamentos')
+        .send(pagamento)
+        .expect(403)
+        .end(function (err, res) {
+          res.body.message.should.be.equal('User is not authorized');            
+          done(err);
+        });     
+      });
+    });
+  });
+  
+
+  it('Deve ser capaz de salvar um pagamento com login de usuario', function(done){
+    agent.post('/api/auth/signin')
+    .send(credentials)
+    .expect(200)
+    .end(function (signinErr, signinRes) {
+
+      if (signinErr) {
+        return done(signinErr);
+      }
+
+      agent.post('/api/pagamentos')
+      .send(pagamento)
+      .expect(200)
+      .end(function (err, res) {     
+
+        res.status.should.be.equal(200);        
+        done(err);
+      }); 
+    });    
   });
 
-  it('Deve ser capaz de salvar um pagamento com login de usuario', function(){
-
+  it('deve ser capaz de retornar uma lista de pagamentos com login de administrador', function(done){
+    done();
   });
 
-  it('deve ser capaz de retornar uma lista de pagamentos com login de administrador', function(){
-
+  it('Não deve ser capaz de retorar um pagamento onde o usuário não é o prorietário', function(done){
+    done();
   });
 
-  it('Não deve ser capaz de retorar um pagamento onde o usuário não é o prorietário', function(){
+  it('Não deve ser capaz de retornar um pagamento pelo id de usuário diferente', function(done){
+    done();
+  });
 
+  it('Deve ser capaz de retornar um pagamento por id solicitado pelo usuário criador', function(done){
+    done();
   });
 
 

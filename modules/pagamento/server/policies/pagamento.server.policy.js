@@ -13,7 +13,7 @@ exports.invokeRolesPolicies = function () {
     roles: ['admin'],
     allows: [{
       resources: '/api/pagamentos',
-      permissions: '*'
+      permissions: ['get']
     }, {
       resources: '/api/pagamentos/:pagamentoId',
       permissions: '*'

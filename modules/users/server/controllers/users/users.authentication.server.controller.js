@@ -24,7 +24,7 @@ exports.signup = function (req, res) {
 
   // Init user and add missing fields
   var user = new User(req.body);
-  user.provider = 'local';
+  user.provider = 'local-token';
   user.displayName = user.firstName + ' ' + user.lastName;
 
   // Then save the user
@@ -52,8 +52,8 @@ exports.signup = function (req, res) {
 /**
  * Signin after passport authentication
  */
-exports.signin = function (req, res, next) {
-  passport.authenticate('local', function (err, user, info) {
+/*exports.signin = function (req, res, next) {
+  passport.authenticate('local-token', function (err, user, info) {
     if (err || !user) {
       res.status(422).send(info);
     } else {
@@ -70,6 +70,27 @@ exports.signin = function (req, res, next) {
       });
     }
   })(req, res, next);
+};*/
+
+exports.signin = function(req, res, next) {
+    passport.authenticate('local-token', function(err, user, info) {
+        if (err || !user) {
+            res.status(400).send(info);
+        } else {
+            // Remove sensitive data before login
+            user.password = undefined;
+            user.salt = undefined;
+
+            req.login(user, function(err) {
+                if (err) {
+                    res.status(400).send(err);
+                } else {
+                    res.json(user);
+                    console.log(user);
+                }
+            });
+        }
+    })(req, res, next);
 };
 
 /**
@@ -92,7 +113,7 @@ exports.oauthCall = function (req, res, next) {
 /**
  * OAuth callback
  */
-exports.oauthCallback = function (req, res, next) {
+/*exports.oauthCallback = function (req, res, next) {
   var strategy = req.params.strategy;
 
   // info.redirect_to contains inteded redirect path
@@ -111,6 +132,23 @@ exports.oauthCallback = function (req, res, next) {
       return res.redirect(info.redirect_to || '/');
     });
   })(req, res, next);
+};*/
+
+exports.oauthCallback = function(strategy) {
+  return function(req, res, next) {
+    passport.authenticate(strategy, function(err, user, redirectURL) {
+      if (err || !user) {
+        return res.redirect('/#!/signin');
+      }
+      req.login(user, function(err) {
+        if (err) {
+          return res.redirect('/#!/signin');
+        }
+
+        return res.redirect(redirectURL || '/');
+      });
+    })(req, res, next);
+  };
 };
 
 /**

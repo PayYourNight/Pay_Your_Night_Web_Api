@@ -27,7 +27,7 @@ var validateLocalStrategyProperty = function (property) {
  * A Validation function for local strategy email
  */
 var validateLocalStrategyEmail = function (email) {
-  return ((this.provider !== 'local' && !this.updated) || validator.isEmail(email, { require_tld: false }));
+  return ((this.provider !== 'local-token' && !this.updated) || validator.isEmail(email, { require_tld: false }));
 };
 
 /**
@@ -43,7 +43,7 @@ var validateLocalStrategyEmail = function (email) {
 var validateUsername = function (username) {
   var usernameRegex = /^(?=[\w.-]+$)(?!.*[._-]{2})(?!\.)(?!.*\.$).{3,34}$/;
   return (
-    this.provider !== 'local' ||
+    this.provider !== 'local-token' ||
     (username && usernameRegex.test(username) && config.illegalUsernames.indexOf(username) < 0)
   );
 };

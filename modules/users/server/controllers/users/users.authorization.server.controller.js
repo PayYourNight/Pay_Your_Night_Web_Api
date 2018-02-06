@@ -47,12 +47,12 @@ exports.requiresLogin = function(req, res, next) {
 /**
  * Require login token routing middleware
  */
-exports.requiresLoginToken = function(req, res, next) {
+exports.requiresLoginToken = function(req, res, next) {  
     // check for login token here
     var loginToken = req.body.loginToken;
-
+    console.log(loginToken);
     // query DB for the user corresponding to the token and act accordingly
-    User.findOne({
+    User.findOne({        
         loginToken: loginToken,
         loginExpires: {
             $gt: Date.now()
@@ -60,7 +60,7 @@ exports.requiresLoginToken = function(req, res, next) {
     }, function(err, user){
         if(!user){
             return res.status(401).send({
-                message: 'Token is incorrect or has expired. Please login again'
+                message: 'Token is incorrect or has expired. Please login again teste'
             });
         }
         if(err){

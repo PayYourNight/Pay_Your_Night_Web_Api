@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\modules",
+    "\\modules\\core",
+    "\\modules\\core\\server",
+    "\\modules\\users",
+    "\\modules\\users\\server",
+    "\\modules\\users\\server\\config",
+    "\\modules\\users\\server\\config\\strategies",
+    "\\modules\\users\\server\\controllers",
+    "\\modules\\users\\server\\controllers\\users"
+  ],
+  "SelectedNode": "\\modules\\users\\server\\config\\strategies\\local-token.js",
+  "PreviewInSolutionExplorer": false
+}

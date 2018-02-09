@@ -49,30 +49,37 @@ exports.requiresLogin = function(req, res, next) {
  */
 exports.requiresLoginToken = function(req, res, next) {  
     // check for login token here
+    var secret = 'keepitquiet';
     var loginToken = req.body.loginToken;
     console.log(loginToken);
-    // query DB for the user corresponding to the token and act accordingly
-    User.findOne({        
-        loginToken: loginToken,
-        loginExpires: {
-            $gt: Date.now()
-        }
-    }, function(err, user){
-        if(!user){
-            return res.status(401).send({
-                message: 'Token is incorrect or has expired. Please login again teste'
-            });
-        }
-        if(err){
-            return res.status(500).send({
-                message: 'There was an internal server error processing your login token'
-            });
-        }
 
-        // bind user object to request and continue
-        req.user = user;
-        next();
+    // verify a token symmetric
+    jwt.verify(token, secret, function (err, decoded) {
+        console.log(decoded.foo) // bar
     });
+
+    // query DB for the user corresponding to the token and act accordingly
+    //User.findOne({        
+    //    loginToken: loginToken,
+    //    loginExpires: {
+    //        $gt: Date.now()
+    //    }
+    //}, function(err, user){
+    //    if(!user){
+    //        return res.status(401).send({
+    //            message: 'Token is incorrect or has expired. Please login again teste'
+    //        });
+    //    }
+    //    if(err){
+    //        return res.status(500).send({
+    //            message: 'There was an internal server error processing your login token'
+    //        });
+    //    }
+
+    //    // bind user object to request and continue
+    //    req.user = user;
+    //    next();
+    //});
 };
 
 /**

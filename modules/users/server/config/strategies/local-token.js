@@ -27,10 +27,10 @@ module.exports = function() {
                     return done(null, false, {
                         message: 'Unknown user'
                     });
-                }
+                }                
                 if (!user.authenticate(password)) {
                     return done(null, false, {
-                        message: 'Invalid password'
+                        message: 'Invalid password' 
                     });
                 }
 

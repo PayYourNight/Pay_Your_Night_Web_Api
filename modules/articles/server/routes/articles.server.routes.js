@@ -19,8 +19,8 @@ module.exports = function (app) {
   // Single article routes
   app.route('/api/articles/:articleId').all(articlesPolicy.isAllowed)
     .get(articles.read)
-    .put(articles.update)
-    .delete(articles.delete);
+    .put(users.requiresLoginToken, articles.update)
+    .delete(users.requiresLoginToken, articles.delete);
 
   // Finish by binding the article middleware
   app.param('articleId', articles.articleByID);

@@ -1,36 +1,38 @@
 'use strict';
 
 /**
- * Module dependencies
+ * Module dependencies.
  */
 var passport = require('passport'),
-  LocalStrategy = require('passport-local').Strategy,
-  User = require('mongoose').model('User');
+    LocalStrategy = require('passport-local').Strategy,
+    User = require('mongoose').model('User');
 
 module.exports = function () {
-  // Use local strategy
-  passport.use(new LocalStrategy({
-    usernameField: 'usernameOrEmail',
-    passwordField: 'password'
-  },
-  function (usernameOrEmail, password, done) {
-    User.findOne({
-      $or: [{
-        username: usernameOrEmail.toLowerCase()
-      }, {
-        email: usernameOrEmail.toLowerCase()
-      }]
-    }, function (err, user) {
-      if (err) {
-        return done(err);
-      }
-      if (!user || !user.authenticate(password)) {
-        return done(null, false, {
-          message: 'Invalid username or password (' + (new Date()).toLocaleTimeString() + ')'
-        });
-      }
+    // Use local strategy
+    passport.use(new LocalStrategy({
+        usernameField: 'username',
+        passwordField: 'password'
+    },
+        function (username, password, done) {
+            User.findOne({
+                username: username
+            }, function (err, user) {
+                if (err) {
+                    return done(err);
+                }
+                if (!user) {
+                    return done(null, false, {
+                        message: 'Unknown user'
+                    });
+                }
+                if (!user.authenticate(password)) {
+                    return done(null, false, {
+                        message: 'Invalid password'
+                    });
+                }
 
-      return done(null, user);
-    });
-  }));
+                return done(null, user);
+            });
+        }
+    ));
 };

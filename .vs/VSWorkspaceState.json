@@ -11,6 +11,6 @@
     "\\modules\\users\\server\\controllers",
     "\\modules\\users\\server\\controllers\\users"
   ],
-  "SelectedNode": "\\modules\\users\\server\\config\\strategies\\local-token.js",
+  "SelectedNode": "\\modules\\users\\server\\config\\strategies\\local.js",
   "PreviewInSolutionExplorer": false
 }

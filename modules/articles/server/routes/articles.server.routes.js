@@ -10,7 +10,7 @@ var path = require('path'),
 
 module.exports = function (app) {
 
-  //app.use(users.requiresLoginToken);
+  app.use(users.requiresLoginToken);
   // Articles collection routes
   app.route('/api/articles').all(articlesPolicy.isAllowed)
     .get(articles.list)
@@ -19,8 +19,8 @@ module.exports = function (app) {
   // Single article routes
   app.route('/api/articles/:articleId').all(articlesPolicy.isAllowed)
     .get(articles.read)
-    .put(users.requiresLoginToken, articles.update)
-    .delete(users.requiresLoginToken, articles.delete);
+    .put(articles.update)
+    .delete(articles.delete);
 
   // Finish by binding the article middleware
   app.param('articleId', articles.articleByID);

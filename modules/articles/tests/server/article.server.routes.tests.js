@@ -45,7 +45,8 @@ describe('Article CRUD tests', function () {
       email: 'test@test.com',
       username: credentials.username,
       password: credentials.password,
-      provider: 'local'
+      provider: 'local',
+      roles: ['admin']
     });
 
     // Save a user to the test db and create new article
@@ -67,18 +68,18 @@ describe('Article CRUD tests', function () {
       .expect(200)
       .end(function (signinErr, signinRes) {            
         // Handle signin error                    
-        if (signinErr) {
+        if (signinErr) {          
           return done(signinErr);
         }
-        
-        article.user = signinRes.body;
-        credentials.loginToken = article.user.loginToken;
+                
+        // article.user = signinRes.body;        
         agent.post('/api/articles')
           .send(article)
-          .expect(403)
+          .expect(200)
           .end(function (articleSaveErr, articleSaveRes) {
+            //console.log(articleSaveRes);
             // Call the assertion callback
-            done(articleSaveErr);
+            done(articleSaveErr);            
           });
       });
   });

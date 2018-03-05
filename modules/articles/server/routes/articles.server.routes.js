@@ -10,11 +10,12 @@ var path = require('path'),
 
 module.exports = function (app) {
 
-  app.use(users.requiresLoginToken);
+  //app.use(users.requiresLoginToken);
+
   // Articles collection routes
   app.route('/api/articles').all(articlesPolicy.isAllowed)
     .get(articles.list)
-    .post(articles.create);
+      .post(users.requiresLoginToken, articles.create);
 
   // Single article routes
   app.route('/api/articles/:articleId').all(articlesPolicy.isAllowed)

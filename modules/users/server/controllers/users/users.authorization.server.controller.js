@@ -5,7 +5,10 @@
  */
 var _ = require('lodash'),
     mongoose = require('mongoose'),
-    User = mongoose.model('User');
+    User = mongoose.model('User'),
+    jwt = require('jsonwebtoken');    
+
+var secret = 'keepitquiet';
 
 /**
  * User middleware
@@ -39,11 +42,10 @@ exports.requiresLogin = function (req, res, next) {
  */
 exports.requiresLoginToken = function (req, res, next) {
     // check for login token here
-    var loginToken = req.body.loginToken;
-    console.log(req.body);
+    var loginToken = req.user.loginToken;    
 
     // query DB for the user corresponding to the token and act accordingly
-    User.findOne({
+/*    User.findOne({
         loginToken: loginToken,
         loginExpires: {
             $gt: Date.now()
@@ -58,11 +60,28 @@ exports.requiresLoginToken = function (req, res, next) {
             return res.status(500).send({
                 message: 'There was an internal server error processing your login token'
             });
-        }
+        }        
 
+        console.log(user);
         // bind user object to request and continue
         req.user = user;
+
         next();
+    });*/
+
+        // verifies secret and checks exp
+    jwt.verify(loginToken, secret , function(err, decoded) {      
+      if (err) {
+        console.log(err);
+        return res.status(401).send({
+                message: 'Failed to authenticate token.'
+            });        
+      } else {        
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;    
+
+        next();
+      }
     });
 };
 

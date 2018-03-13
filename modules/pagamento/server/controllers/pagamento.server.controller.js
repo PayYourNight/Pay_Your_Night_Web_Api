@@ -4,11 +4,9 @@ var path = require('path'),
   mongoose = require('mongoose'),
   Pagamento = mongoose.model('Pagamento'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-  //_ = require('lodash');
 
 exports.create = function (req, res) {
   var pagamento = new Pagamento(req.body);
-  //pagamento.usuario = req.user;
 
   pagamento.save(function (err) {
     if (err) {
@@ -45,14 +43,14 @@ exports.pagamentoByID = function (req, res, next, id) {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
-      message: 'Id do Pagamento é Invalido'
+      message: 'Id do Pagamento Ã© Invalido'
     });
   }
 
   Pagamento.findById(id).exec(function (err, pagamento) {
     if (err) {
       return next(err);
-    } else if (!article) {
+    } else if (!pagamento) {
       return res.status(404).send({
         message: 'Nenhum Pagamento foi encontrado para este ID'
       });

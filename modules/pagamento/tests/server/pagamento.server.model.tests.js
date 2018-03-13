@@ -22,8 +22,8 @@ var user,
     produtoConsumo,
     pagamento;
 
-describe('Pagamento Model Unit Tests:', function() {
-    beforeEach(function(done) {
+describe('Pagamento Model Unit Tests:', function () {
+    beforeEach(function (done) {
         user = new User({
             firstName: 'Full',
             lastName: 'Name',
@@ -51,7 +51,7 @@ describe('Pagamento Model Unit Tests:', function() {
         });
 
         user.save()
-            .then(function() {
+            .then(function () {
                 meioPagamento = new MeioPagamento({
                     usuario: user,
                     tipoMeioPagamento: ['credito'],
@@ -61,7 +61,7 @@ describe('Pagamento Model Unit Tests:', function() {
                     codigoSeguranca: '082'
                 });
                 meioPagamento.save()
-                    .then(function() {
+                    .then(function () {
                         estabelecimento.save()
                             .then(function() {
                                 checkin = new Checkin({

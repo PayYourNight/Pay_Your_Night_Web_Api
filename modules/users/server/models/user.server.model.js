@@ -119,6 +119,13 @@ var UserSchema = new Schema({
     type: Date,
     default: Date.now
   },
+    /* For user login */
+  loginToken: {
+    type: String
+  },
+  loginExpires: {
+    type: Date
+  },
   /* For reset password */
   resetPasswordToken: {
     type: String
@@ -169,7 +176,7 @@ UserSchema.methods.hashPassword = function (password) {
 /**
  * Create instance method for authenticating user
  */
-UserSchema.methods.authenticate = function (password) {
+UserSchema.methods.authenticate = function (password, hash) {
   return this.password === this.hashPassword(password);
 };
 

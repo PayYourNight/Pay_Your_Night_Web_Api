@@ -23,8 +23,7 @@ module.exports = function (io, socket) {
   });
 
   // Emit the status event when a socket client is disconnected
-  socket.on('disconnect', function () {
-    console.log('desconectado');
+  socket.on('disconnect', function () {    
     io.emit('chatMessage', {
       type: 'status',
       text: 'disconnected',

@@ -12,37 +12,28 @@ exports.invokeRolesPolicies = function () {
   acl.allow([{
     roles: ['admin'],
     allows: [{
-      resources: '/api/pagamentos',
+      resources: '/api/checkin',
       permissions: ['get']
     }, {
-      resources: '/api/pagamentos/:pagamentoId',
+      resources: '/api/checkin/:checkinId',
       permissions: '*'
     }]
   }, {
     roles: ['admimEst'],
     allows: [{
-      resources: '/api/pagamentos',
+      resources: '/api/checkin',
       permissions: ['get']
     }, {
-      resources: '/api/pagamentos/:pagamentoId',
-      permissions: ['get']
-    }]
-  }, {
-    roles: ['user'],
-    allows: [{
-      resources: '/api/pagamentos',
-      permissions: ['get', 'post']
-    }, {
-      resources: '/api/pagamentos/:pagamentoId',
+      resources: '/api/checkin/:checkinId',
       permissions: ['get']
     }]
   }, {
     roles: ['caixa'],
     allows: [{
-      resources: '/api/pagamentos',
+      resources: '/api/checkin',
       permissions: ['get', 'post']
     }, {
-      resources: '/api/pagamentos/:pagamentoId',
+      resources: '/api/checkin/:checkinId',
       permissions: ['get']
     }]
   }]);

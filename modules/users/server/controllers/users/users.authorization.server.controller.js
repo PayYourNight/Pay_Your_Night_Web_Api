@@ -4,9 +4,9 @@
  * Module dependencies.
  */
 var _ = require('lodash'),
-    mongoose = require('mongoose'),
-    User = mongoose.model('User'),
-    jwt = require('jsonwebtoken');    
+  mongoose = require('mongoose'),
+  User = mongoose.model('User'),
+  jwt = require('jsonwebtoken');
 
 var secret = 'keepitquiet';
 
@@ -14,92 +14,92 @@ var secret = 'keepitquiet';
  * User middleware
  */
 exports.userByID = function (req, res, next, id) {
-    User.findOne({
-        _id: id
-    }).exec(function (err, user) {
-        if (err) return next(err);
-        if (!user) return next(new Error('Failed to load User ' + id));
-        req.profile = user;
-        next();
-    });
+  User.findOne({
+    _id: id
+  }).exec(function (err, user) {
+    if (err) return next(err);
+    if (!user) return next(new Error('Failed to load User ' + id));
+    req.profile = user;
+    next();
+  });
 };
 
 /**
  * Require login routing middleware
  */
 exports.requiresLogin = function (req, res, next) {
-    if (!req.isAuthenticated()) {
-        return res.status(401).send({
-            message: 'User is not logged in'
-        });
-    }
+  if (!req.isAuthenticated()) {
+    return res.status(401).send({
+      message: 'User is not logged in'
+    });
+  }
 
-    next();
+  next();
 };
 
 /**
  * Require login token routing middleware
  */
 exports.requiresLoginToken = function (req, res, next) {
-    // check for login token here
-    var loginToken = req.user.loginToken;    
+  // check for login token here
+  var loginToken = req.user.loginToken;
 
-    // query DB for the user corresponding to the token and act accordingly
-/*    User.findOne({
-        loginToken: loginToken,
-        loginExpires: {
-            $gt: Date.now()
-        }
-    }, function (err, user) {
-        if (!user) {
-            return res.status(401).send({
-                message: 'Token is incorrect or has expired. Please login again'
-            });
-        }
-        if (err) {
-            return res.status(500).send({
-                message: 'There was an internal server error processing your login token'
-            });
-        }        
+  // query DB for the user corresponding to the token and act accordingly
+  /*    User.findOne({
+          loginToken: loginToken,
+          loginExpires: {
+              $gt: Date.now()
+          }
+      }, function (err, user) {
+          if (!user) {
+              return res.status(401).send({
+                  message: 'Token is incorrect or has expired. Please login again'
+              });
+          }
+          if (err) {
+              return res.status(500).send({
+                  message: 'There was an internal server error processing your login token'
+              });
+          }
 
-        console.log(user);
-        // bind user object to request and continue
-        req.user = user;
+          console.log(user);
+          // bind user object to request and continue
+          req.user = user;
 
-        next();
-    });*/
+          next();
+      });*/
 
-        // verifies secret and checks exp
-    jwt.verify(loginToken, secret , function(err, decoded) {      
-      if (err) {
-        console.log(err);
-        return res.status(401).send({
-                message: 'Failed to authenticate token.'
-            });        
-      } else {        
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;    
+  // verifies secret and checks exp
+  jwt.verify(loginToken, secret, function (err, decoded) {
+    if (err) {
+      console.log(err);
+      return res.status(401).send({
+        message: 'Failed to authenticate token.'
+      });
+    } else {
+      // if everything is good, save to request for use in other routes
+      req.decoded = decoded;
 
-        next();
-      }
-    });
+      next();
+    }
+  });
 };
 
 /**
  * User authorizations routing middleware
  */
 exports.hasAuthorization = function (roles) {
-    var _this = this;
+  var _this = this;
 
-    return function (req, res, next) {
-        _this.requiresLogin(req, res, function () {
-            if (_.intersection(req.user.roles, roles).length) {
-                return next();
-            } else {
-                return res.status(403).send({
-                    message: 'User is not authorized'
-                });
-            }
+  return function (req, res, next) {
+    _this.requiresLogin(req, res, function () {
+      if (_.intersection(req.user.roles, roles).length) {
+        return next();
+      } else {
+        return res.status(403).send({
+          message: 'User is not authorized'
         });
-    };
+      }
+    });
+  };
 };

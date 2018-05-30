@@ -132,6 +132,18 @@ var UserSchema = new Schema({
   },
   resetPasswordExpires: {
     type: Date
+  },
+  estabelecimento: {
+    type: Schema.ObjectId,
+    ref: 'Estabelecimento'
+  },
+  platform: {
+    type: [{
+      type: String,
+      enum: ['web', 'mobile']
+    }],
+    default: ['mobile'],
+    required: 'Please provide at least one platform'
   }
 });
 

@@ -51,7 +51,7 @@ exports.signup = function (req, res) {
 };
 
 exports.signin = function (req, res, next) {
-  passport.authenticate('passport-jwt', function (err, user, info) {
+  passport.authenticate('jwt', function (err, user, info) {
     if (err || !user) {
       res.status(400).send(info);
     } else {
@@ -76,12 +76,13 @@ exports.authenticate = function (req, res, next) {
 
   User.findOne({ 'username': username }, function (err, user) {
     if (err) throw err;
+    console.log(user);
     if (!user) {
-      return res.json({ sucess: false, message: 'User not found' });
+      return res.status(400).send({ sucess: false, message: 'User not found' }); // res.json({ sucess: false, message: 'User not found' });
     }
 
     if (!user.authenticate(password)) {
-      return res.json({ sucess: false, message: 'Wrong Password' });
+      return res.status(400).send({ sucess: false, message: 'Wrong Password' });
     } else {
       const token = jwt.sign(user.toJSON(), 'secret', {
         expiresIn: 604800

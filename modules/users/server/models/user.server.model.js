@@ -119,12 +119,31 @@ var UserSchema = new Schema({
     type: Date,
     default: Date.now
   },
+    /* For user login */
+  loginToken: {
+    type: String
+  },
+  loginExpires: {
+    type: Date
+  },
   /* For reset password */
   resetPasswordToken: {
     type: String
   },
   resetPasswordExpires: {
     type: Date
+  },
+  estabelecimento: {
+    type: Schema.ObjectId,
+    ref: 'Estabelecimento'
+  },
+  platform: {
+    type: [{
+      type: String,
+      enum: ['web', 'mobile']
+    }],
+    default: ['mobile'],
+    required: 'Please provide at least one platform'
   }
 });
 
@@ -169,7 +188,7 @@ UserSchema.methods.hashPassword = function (password) {
 /**
  * Create instance method for authenticating user
  */
-UserSchema.methods.authenticate = function (password) {
+UserSchema.methods.authenticate = function (password, hash) {  
   return this.password === this.hashPassword(password);
 };
 

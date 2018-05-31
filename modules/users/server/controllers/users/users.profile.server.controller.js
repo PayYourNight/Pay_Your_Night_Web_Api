@@ -142,7 +142,11 @@ exports.changeProfilePicture = function (req, res) {
       if (existingImageUrl !== User.schema.path('profileImageURL').defaultValue) {
         if (useS3Storage) {
           try {
-            var { region, bucket, key } = amazonS3URI(existingImageUrl);
+            var {
+              region,
+              bucket,
+              key
+            } = amazonS3URI(existingImageUrl);
             var params = {
               Bucket: config.aws.s3.bucket,
               Key: key

@@ -1,19 +1,17 @@
 'use strict';
 
 /**
- * Module dependencies
+ * Module dependencies.
  */
-var path = require('path'),
+var _ = require('lodash'),
+  path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  User = mongoose.model('User');
+  User = mongoose.model('User'),
+  jwt = require('jsonwebtoken');
 
-// URLs for which user can't be redirected on signin
-var noReturnUrls = [
-  '/authentication/signin',
-  '/authentication/signup'
-];
+var secret = 'keepitquiet';
 
 /**
  * Signup
@@ -22,15 +20,18 @@ exports.signup = function (req, res) {
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
-  // Init user and add missing fields
+  // Init Variables
   var user = new User(req.body);
-  user.provider = 'local';
+  var message = null;
+
+  // Add missing user fields
+  user.provider = 'bearer';
   user.displayName = user.firstName + ' ' + user.lastName;
 
   // Then save the user
   user.save(function (err) {
     if (err) {
-      return res.status(422).send({
+      return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
@@ -49,13 +50,10 @@ exports.signup = function (req, res) {
   });
 };
 
-/**
- * Signin after passport authentication
- */
 exports.signin = function (req, res, next) {
-  passport.authenticate('local', function (err, user, info) {
+  passport.authenticate('jwt', function (err, user, info) {
     if (err || !user) {
-      res.status(422).send(info);
+      res.status(400).send(info);
     } else {
       // Remove sensitive data before login
       user.password = undefined;
@@ -71,6 +69,79 @@ exports.signin = function (req, res, next) {
     }
   })(req, res, next);
 };
+
+exports.authenticate = function (req, res, next) {
+  const username = req.body.usernameOrEmail;
+  const password = req.body.password;
+
+  User.findOne({ 'username': username }, function (err, user) {
+    if (err) throw err;
+    console.log(user);
+    if (!user) {
+      return res.status(400).send({ sucess: false, message: 'User not found' }); // res.json({ sucess: false, message: 'User not found' });
+    }
+
+    if (!user.authenticate(password)) {
+      return res.status(400).send({ sucess: false, message: 'Wrong Password' });
+    } else {
+      const token = jwt.sign(user.toJSON(), 'secret', {
+        expiresIn: 604800
+      });
+
+      user.password = undefined;
+      user.salt = undefined;
+
+      res.json({
+        sucess: true,
+        token: 'JWT ' + token,
+        user: user
+      });
+    }
+  });
+};
+
+/**
+ * Signin after passport authentication
+ */
+// exports.signin = function (req, res, next) {
+//   passport.authenticate('local', function (err, user, info) {
+//     if (err || !user) {
+//       res.status(400).send(info);
+//     } else {
+//             // Remove sensitive data before login
+//       user.password = undefined;
+//       user.salt = undefined;
+
+//       req.login(user, function (err) {
+//         if (err) {
+//           res.status(400).send(err);
+//         } else {
+//           res.json(user);
+//         }
+//       });
+//     }
+//   })(req, res, next);
+// };
+
+// exports.signin = function (req, res, next) {
+//   passport.authenticate('local-token', function (err, user, info) {      
+//     if (err || !user) {
+//       res.status(400).send(info);
+//     } else {
+//             // Remove sensitive data before login
+//       user.password = undefined;
+//       user.salt = undefined;
+
+//       req.login(user, function (err) {
+//         if (err) {
+//           res.status(400).send(err);
+//         } else {
+//           res.json(user);
+//         }
+//       });
+//     }
+//   })(req, res, next);
+// };
 
 /**
  * Signout
@@ -80,123 +151,116 @@ exports.signout = function (req, res) {
   res.redirect('/');
 };
 
-/**
- * OAuth provider call
- */
-exports.oauthCall = function (req, res, next) {
-  var strategy = req.params.strategy;
-  // Authenticate
-  passport.authenticate(strategy)(req, res, next);
-};
+// exports.signout = function(req, res) {
+//    // get login token
+//    var loginToken = req.body.loginToken;
+//
+//    // decode the token to find out which user it came from
+//    var decodedPayload = jwt.decode(loginToken, secret);
+//
+//    var username = decodedPayload.username;
+//    console.log(username);
+//
+//    // remove login token information from user object
+//    User.findOne({username: username}, function(err, user) {
+//        if (err){
+//            res.status(400).send(err);
+//        } else {
+//            user.loginToken = undefined;
+//            user.loginExpires = undefined;
+//
+//            // update the user object in the database
+//            user.save(function(err) {
+//                if(err){
+//                    res.status(400).send(err);
+//                } else {
+//                    res.send({message: username + ' successfully logged out'});
+//                }
+//            });
+//        }
+//    });
+// };
 
 /**
  * OAuth callback
  */
-exports.oauthCallback = function (req, res, next) {
-  var strategy = req.params.strategy;
-
-  // info.redirect_to contains inteded redirect path
-  passport.authenticate(strategy, function (err, user, info) {
-    if (err) {
-      return res.redirect('/authentication/signin?err=' + encodeURIComponent(errorHandler.getErrorMessage(err)));
-    }
-    if (!user) {
-      return res.redirect('/authentication/signin');
-    }
-    req.login(user, function (err) {
-      if (err) {
-        return res.redirect('/authentication/signin');
+exports.oauthCallback = function (strategy) {
+  return function (req, res, next) {
+    passport.authenticate(strategy, function (err, user, redirectURL) {
+      if (err || !user) {
+        return res.redirect('/#!/signin');
       }
+      req.login(user, function (err) {
+        if (err) {
+          return res.redirect('/#!/signin');
+        }
 
-      return res.redirect(info.redirect_to || '/');
-    });
-  })(req, res, next);
+        return res.redirect(redirectURL || '/');
+      });
+    })(req, res, next);
+  };
 };
 
 /**
  * Helper function to save or update a OAuth user profile
  */
 exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
-  // Setup info and user objects
-  var info = {};
-  var user;
+  if (!req.user) {
+    // Define a search query fields
+    var searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
+    var searchAdditionalProviderIdentifierField = 'additionalProvidersData.' + providerUserProfile.provider + '.' + providerUserProfile.providerIdentifierField;
 
-  // Set redirection path on session.
-  // Do not redirect to a signin or signup page
-  if (noReturnUrls.indexOf(req.session.redirect_to) === -1) {
-    info.redirect_to = req.session.redirect_to;
-  }
+    // Define main provider search query
+    var mainProviderSearchQuery = {};
+    mainProviderSearchQuery.provider = providerUserProfile.provider;
+    mainProviderSearchQuery[searchMainProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
 
-  // Define a search query fields
-  var searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
-  var searchAdditionalProviderIdentifierField = 'additionalProvidersData.' + providerUserProfile.provider + '.' + providerUserProfile.providerIdentifierField;
+    // Define additional provider search query
+    var additionalProviderSearchQuery = {};
+    additionalProviderSearchQuery[searchAdditionalProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
 
-  // Define main provider search query
-  var mainProviderSearchQuery = {};
-  mainProviderSearchQuery.provider = providerUserProfile.provider;
-  mainProviderSearchQuery[searchMainProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
+    // Define a search query to find existing user with current provider profile
+    var searchQuery = {
+      $or: [mainProviderSearchQuery, additionalProviderSearchQuery]
+    };
 
-  // Define additional provider search query
-  var additionalProviderSearchQuery = {};
-  additionalProviderSearchQuery[searchAdditionalProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
-
-  // Define a search query to find existing user with current provider profile
-  var searchQuery = {
-    $or: [mainProviderSearchQuery, additionalProviderSearchQuery]
-  };
-
-  // Find existing user with this provider account
-  User.findOne(searchQuery, function (err, existingUser) {
-    if (err) {
-      return done(err);
-    }
-
-    if (!req.user) {
-      if (!existingUser) {
-        var possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
-
-        User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
-          user = new User({
-            firstName: providerUserProfile.firstName,
-            lastName: providerUserProfile.lastName,
-            username: availableUsername,
-            displayName: providerUserProfile.displayName,
-            profileImageURL: providerUserProfile.profileImageURL,
-            provider: providerUserProfile.provider,
-            providerData: providerUserProfile.providerData
-          });
-
-          // Email intentionally added later to allow defaults (sparse settings) to be applid.
-          // Handles case where no email is supplied.
-          // See comment: https://github.com/meanjs/mean/pull/1495#issuecomment-246090193
-          user.email = providerUserProfile.email;
-
-          // And save the user
-          user.save(function (err) {
-            return done(err, user, info);
-          });
-        });
+    User.findOne(searchQuery, function (err, user) {
+      if (err) {
+        return done(err);
       } else {
-        return done(err, existingUser, info);
-      }
-    } else {
-      // User is already logged in, join the provider data to the existing user
-      user = req.user;
+        if (!user) {
+          var possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
 
-      // Check if an existing user was found for this provider account
-      if (existingUser) {
-        if (user.id !== existingUser.id) {
-          return done(new Error('Account is already connected to another user'), user, info);
+          User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
+            user = new User({
+              firstName: providerUserProfile.firstName,
+              lastName: providerUserProfile.lastName,
+              username: availableUsername,
+              displayName: providerUserProfile.displayName,
+              email: providerUserProfile.email,
+              profileImageURL: providerUserProfile.profileImageURL,
+              provider: providerUserProfile.provider,
+              providerData: providerUserProfile.providerData
+            });
+
+            // And save the user
+            user.save(function (err) {
+              return done(err, user);
+            });
+          });
+        } else {
+          return done(err, user);
         }
-
-        return done(new Error('User is already connected using this provider'), user, info);
       }
+    });
+  } else {
+    // User is already logged in, join the provider data to the existing user
+    var user = req.user;
 
+    // Check if user exists, is not signed in using this provider, and doesn't have that provider data already configured
+    if (user.provider !== providerUserProfile.provider && (!user.additionalProvidersData || !user.additionalProvidersData[providerUserProfile.provider])) {
       // Add the provider data to the additional provider data field
-      if (!user.additionalProvidersData) {
-        user.additionalProvidersData = {};
-      }
-
+      if (!user.additionalProvidersData) user.additionalProvidersData = {};
       user.additionalProvidersData[providerUserProfile.provider] = providerUserProfile.providerData;
 
       // Then tell mongoose that we've updated the additionalProvidersData field
@@ -204,10 +268,12 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
 
       // And save the user
       user.save(function (err) {
-        return done(err, user, info);
+        return done(err, user, '/#!/settings/accounts');
       });
+    } else {
+      return done(new Error('User is already connected using this provider'), user);
     }
-  });
+  }
 };
 
 /**
@@ -215,37 +281,31 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
  */
 exports.removeOAuthProvider = function (req, res, next) {
   var user = req.user;
-  var provider = req.query.provider;
+  var provider = req.param('provider');
 
-  if (!user) {
-    return res.status(401).json({
-      message: 'User is not authenticated'
-    });
-  } else if (!provider) {
-    return res.status(400).send();
-  }
+  if (user && provider) {
+    // Delete the additional provider
+    if (user.additionalProvidersData[provider]) {
+      delete user.additionalProvidersData[provider];
 
-  // Delete the additional provider
-  if (user.additionalProvidersData[provider]) {
-    delete user.additionalProvidersData[provider];
-
-    // Then tell mongoose that we've updated the additionalProvidersData field
-    user.markModified('additionalProvidersData');
-  }
-
-  user.save(function (err) {
-    if (err) {
-      return res.status(422).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      req.login(user, function (err) {
-        if (err) {
-          return res.status(400).send(err);
-        } else {
-          return res.json(user);
-        }
-      });
+      // Then tell mongoose that we've updated the additionalProvidersData field
+      user.markModified('additionalProvidersData');
     }
-  });
+
+    user.save(function (err) {
+      if (err) {
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(err)
+        });
+      } else {
+        req.login(user, function (err) {
+          if (err) {
+            res.status(400).send(err);
+          } else {
+            res.json(user);
+          }
+        });
+      }
+    });
+  }
 };

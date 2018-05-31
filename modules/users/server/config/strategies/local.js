@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Module dependencies
+ * Module dependencies.
  */
 var passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy,
@@ -13,24 +13,26 @@ module.exports = function () {
     usernameField: 'usernameOrEmail',
     passwordField: 'password'
   },
-  function (usernameOrEmail, password, done) {
-    User.findOne({
-      $or: [{
-        username: usernameOrEmail.toLowerCase()
-      }, {
-        email: usernameOrEmail.toLowerCase()
-      }]
-    }, function (err, user) {
-      if (err) {
-        return done(err);
-      }
-      if (!user || !user.authenticate(password)) {
-        return done(null, false, {
-          message: 'Invalid username or password (' + (new Date()).toLocaleTimeString() + ')'
-        });
-      }
+    function (username, password, done) {
+      User.findOne({
+        username: username
+      }, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        if (!user) {
+          return done(null, false, {
+            message: 'Unknown user'
+          });
+        }
+        if (!user.authenticate(password)) {
+          return done(null, false, {
+            message: 'Invalid password'
+          });
+        }
 
-      return done(null, user);
-    });
-  }));
+        return done(null, user);
+      });
+    }
+  ));
 };

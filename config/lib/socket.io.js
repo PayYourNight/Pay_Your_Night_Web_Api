@@ -10,7 +10,8 @@ var config = require('../config'),
   passport = require('passport'),
   socketio = require('socket.io'),
   session = require('express-session'),
-  MongoStore = require('connect-mongo')(session);
+  MongoStore = require('connect-mongo')(session),
+  users = {};
 
 // Define the Socket.io configuration method
 module.exports = function (app, db) {
@@ -111,18 +112,20 @@ module.exports = function (app, db) {
     console.log('###################################################');
     config.files.server.sockets.forEach(function (socketConfiguration) {
       require(path.resolve(socketConfiguration))(io, socket);
+      users[socket.id] = socket;
       console.log('A new conection has connected with the id ' + socket.id);
     });
 
-    socket.on('checkin', function () {
-      console.log('checkin registrado');
-      io.emit('checkin', {
-        type: 'status',
-        text: 'check-in realizado!',
-        created: Date.now(),
-        username: socket.request.user.username
-      });
-    });
+    // socket.on('checkin', function () {
+    //   console.log('checkin registrado');
+    //   io.emit('checkin', {
+    //     type: 'status',
+    //     text: 'check-in realizado!',
+    //     created: Date.now(),
+    //     username: socket.request.user.username
+    //   });
+    // });
+
     socket.on('checkout', function () {
       console.log('checkout registrado');
       io.emit('checkout', {
@@ -132,14 +135,26 @@ module.exports = function (app, db) {
         username: socket.request.user.username
       });
     });
-    socket.on('consumo', function () {
-      console.log('consumo registrado');
-      io.emit('consumo', {
-        type: 'status',
-        text: 'consumo incluido!',
-        created: Date.now(),
-        username: socket.request.user.username
-      });
+
+    // socket.on('consumo', function () {
+    //   console.log('consumo registrado');
+    //   io.emit('consumo', {
+    //     type: 'status',
+    //     text: 'consumo incluido!',
+    //     created: Date.now(),
+    //     username: socket.request.user.username
+    //   });
+    // });
+
+    socket.on('disconnect', function () {
+      console.log('desconectado ' + socket.id);
+      // io.emit('chatMessage', {
+      //   type: 'status',
+      //   text: 'disconnected',
+      //   created: Date.now(),
+      //   profileImageURL: socket.request.user.profileImageURL,
+      //   username: socket.request.user.username
+      // });
     });
   });
 

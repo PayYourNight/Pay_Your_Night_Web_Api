@@ -12,70 +12,40 @@ exports.invokeRolesPolicies = function () {
   acl.allow([{
     roles: ['admin'],
     allows: [{
-      resources: '/api/pagamentos',
+      resources: '/api/checkin',
       permissions: ['get']
     }, {
-      resources: '/api/pagamentos/:pagamentoId',
+      resources: '/api/checkin/:checkinId',
       permissions: '*'
     }]
   }, {
     roles: ['admimEst'],
     allows: [{
-      resources: '/api/pagamentos',
+      resources: '/api/checkin',
       permissions: ['get']
     }, {
-      resources: '/api/pagamentos/:pagamentoId',
-      permissions: ['get']
-    }]
-<<<<<<< HEAD
-    }, {
-      roles: ['user'],
-      allows: [{
-        resources: '/api/pagamentos',
-        permissions: ['get', 'post']
-      }, {
-        resources: '/api/pagamentos/:pagamentoId',
-        permissions: ['get']
-      }]
-=======
-  }, {
-    roles: ['user'],
-    allows: [{
-      resources: '/api/pagamentos',
-      permissions: ['get', 'post']
-    }, {
-      resources: '/api/pagamentos/:pagamentoId',
+      resources: '/api/checkin/:checkinId',
       permissions: ['get']
     }]
->>>>>>> d24a9680a2018465ce68666a2e27d63f92fbe5fe
   }, {
     roles: ['caixa'],
     allows: [{
-      resources: '/api/pagamentos',
+      resources: '/api/checkin',
       permissions: ['get', 'post']
     }, {
-      resources: '/api/pagamentos/:pagamentoId',
+      resources: '/api/checkin/:checkinId',
       permissions: ['get']
     }]
   }]);
 };
 
 exports.isAllowed = function (req, res, next) {
-<<<<<<< HEAD
-  //var roles = (req.user) ? req.user.roles : ['guest'];
-
-  // If an article is being processed and the current user created it then allow any manipulation
-  //if (req.article && req.user && req.article.user && req.article.user.id === req.user.id) {
-    //return next();
-  //}
-=======
   var roles = (req.user) ? req.user.roles : ['guest'];
 
   // If an article is being processed and the current user created it then allow any manipulation
   if (req.article && req.user && req.article.user && req.article.user.id === req.user.id) {
     return next();
   }
->>>>>>> d24a9680a2018465ce68666a2e27d63f92fbe5fe
 
   // Check for user roles
   acl.areAnyRolesAllowed(roles, req.route.path, req.method.toLowerCase(), function (err, isAllowed) {

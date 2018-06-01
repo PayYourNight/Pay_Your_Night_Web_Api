@@ -9,10 +9,17 @@ var passport = require('passport'),
     config = require(path.resolve('./config/config'));
 
 module.exports = function (app, db) {
+<<<<<<< HEAD
     // Serialize sessions
     passport.serializeUser(function (user, done) {
         done(null, user.id);
     });
+=======
+  // Serialize sessions
+  passport.serializeUser(function (user, done) {
+    done(null, user.id);
+  });
+>>>>>>> d24a9680a2018465ce68666a2e27d63f92fbe5fe
 
     // Deserialize sessions
     passport.deserializeUser(function (id, done) {

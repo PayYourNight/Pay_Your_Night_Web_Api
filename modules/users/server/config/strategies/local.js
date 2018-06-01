@@ -8,6 +8,7 @@ var passport = require('passport'),
     User = require('mongoose').model('User');
 
 module.exports = function () {
+<<<<<<< HEAD
     // Use local strategy
     passport.use(new LocalStrategy({
         usernameField: 'username',
@@ -35,4 +36,33 @@ module.exports = function () {
             });
         }
     ));
+=======
+  // Use local strategy
+  passport.use(new LocalStrategy({
+    usernameField: 'usernameOrEmail',
+    passwordField: 'password'
+  },
+    function (username, password, done) {
+      User.findOne({
+        username: username
+      }, function (err, user) {
+        if (err) {
+          return done(err);
+        }
+        if (!user) {
+          return done(null, false, {
+            message: 'Unknown user'
+          });
+        }
+        if (!user.authenticate(password)) {
+          return done(null, false, {
+            message: 'Invalid password'
+          });
+        }
+
+        return done(null, user);
+      });
+    }
+  ));
+>>>>>>> d24a9680a2018465ce68666a2e27d63f92fbe5fe
 };

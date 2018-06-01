@@ -132,6 +132,18 @@ var UserSchema = new Schema({
   },
   resetPasswordExpires: {
     type: Date
+  },
+  estabelecimento: {
+    type: Schema.ObjectId,
+    ref: 'Estabelecimento'
+  },
+  platform: {
+    type: [{
+      type: String,
+      enum: ['web', 'mobile']
+    }],
+    default: ['mobile'],
+    required: 'Please provide at least one platform'
   }
 });
 
@@ -176,7 +188,11 @@ UserSchema.methods.hashPassword = function (password) {
 /**
  * Create instance method for authenticating user
  */
+<<<<<<< HEAD
 UserSchema.methods.authenticate = function (password, hash) {
+=======
+UserSchema.methods.authenticate = function (password, hash) {  
+>>>>>>> d24a9680a2018465ce68666a2e27d63f92fbe5fe
   return this.password === this.hashPassword(password);
 };
 

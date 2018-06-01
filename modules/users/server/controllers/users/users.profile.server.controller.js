@@ -69,6 +69,7 @@ exports.update = function(req, res) {
 /**
  * Update profile picture
  */
+<<<<<<< HEAD
 exports.changeProfilePicture = function(req, res) {
     var user = req.user;
     var existingImageUrl;
@@ -103,6 +104,98 @@ exports.changeProfilePicture = function(req, res) {
             })
             .catch(function(err) {
                 res.status(422).send(err);
+=======
+exports.changeProfilePicture = function (req, res) {
+  var user = req.user;
+  var existingImageUrl;
+  var multerConfig;
+
+
+  if (useS3Storage) {
+    multerConfig = {
+      storage: multerS3({
+        s3: s3,
+        bucket: config.aws.s3.bucket,
+        acl: 'public-read'
+      })
+    };
+  } else {
+    multerConfig = config.uploads.profile.image;
+  }
+
+  // Filtering to upload only images
+  multerConfig.fileFilter = require(path.resolve('./config/lib/multer')).imageFileFilter;
+
+  var upload = multer(multerConfig).single('newProfilePicture');
+
+  if (user) {
+    existingImageUrl = user.profileImageURL;
+    uploadImage()
+      .then(updateUser)
+      .then(deleteOldImage)
+      .then(login)
+      .then(function () {
+        res.json(user);
+      })
+      .catch(function (err) {
+        res.status(422).send(err);
+      });
+  } else {
+    res.status(401).send({
+      message: 'User is not signed in'
+    });
+  }
+
+  function uploadImage() {
+    return new Promise(function (resolve, reject) {
+      upload(req, res, function (uploadError) {
+        if (uploadError) {
+          reject(errorHandler.getErrorMessage(uploadError));
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  function updateUser() {
+    return new Promise(function (resolve, reject) {
+      user.profileImageURL = config.uploads.storage === 's3' && config.aws.s3 ?
+        req.file.location :
+        '/' + req.file.path;
+      user.save(function (err, theuser) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  function deleteOldImage() {
+    return new Promise(function (resolve, reject) {
+      if (existingImageUrl !== User.schema.path('profileImageURL').defaultValue) {
+        if (useS3Storage) {
+          try {
+            var {
+              region,
+              bucket,
+              key
+            } = amazonS3URI(existingImageUrl);
+            var params = {
+              Bucket: config.aws.s3.bucket,
+              Key: key
+            };
+
+            s3.deleteObject(params, function (err) {
+              if (err) {
+                console.log('Error occurred while deleting old profile picture.');
+                console.log('Check if you have sufficient permissions : ' + err);
+              }
+
+              resolve();
+>>>>>>> d24a9680a2018465ce68666a2e27d63f92fbe5fe
             });
     } else {
         res.status(401).send({

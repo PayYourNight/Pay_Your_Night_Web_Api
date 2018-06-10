@@ -1,64 +1,64 @@
-/* eslint-disable */
-'use strict';
+// /* eslint-disable */
+// 'use strict';
 
-var should = require('should'),
-    mongoose = require('mongoose'),
-    User = mongoose.model('User'),
-    Checkin = mongoose.model('Checkin'),
-    Estabelecimento = mongoose.model('Estabelecimento');
+// var should = require('should'),
+//     mongoose = require('mongoose'),
+//     User = mongoose.model('User'),
+//     Checkin = mongoose.model('Checkin'),
+//     Estabelecimento = mongoose.model('Estabelecimento');
 
-var user,
-    estabelecimento,
-    checkin;
+// var user,
+//     estabelecimento,
+//     checkin;
 
 
-describe('Checkin Model Unit Tests:', function() {
-    beforeEach(function(done) {
-        user = new User({
-            firstName: 'Full',
-            lastName: 'Name',
-            displayName: 'Full Name',
-            email: 'test@test.com',
-            username: 'username',
-            password: 'M3@n.jsI$Aw3$0m3',
-            provider: 'local'
-        });
+// describe('Checkin Model Unit Tests:', function() {
+//     beforeEach(function(done) {
+//         user = new User({
+//             firstName: 'Full',
+//             lastName: 'Name',
+//             displayName: 'Full Name',
+//             email: 'test@test.com',
+//             username: 'username',
+//             password: 'M3@n.jsI$Aw3$0m3',
+//             provider: 'local'
+//         });
 
-        estabelecimento = new Estabelecimento({
-            nome: 'Empresa01',
-            cnpj: '1234566789101112'
-        });
+//         estabelecimento = new Estabelecimento({
+//             nome: 'Empresa01',
+//             cnpj: '1234566789101112'
+//         });
 
-        user.save()
-            .then(function() {
-                estabelecimento.save()
-                    .then(function() {
-                        checkin = new Checkin({
-                            usuario: user,
-                            estabelecimento: estabelecimento
-                        });
+//         user.save()
+//             .then(function() {
+//                 estabelecimento.save()
+//                     .then(function() {
+//                         checkin = new Checkin({
+//                             usuario: user,
+//                             estabelecimento: estabelecimento
+//                         });
                         
-                        done();
-                    });
-            })
-            .catch(done);
-    });
+//                         done();
+//                     });
+//             })
+//             .catch(done);
+//     });
 
-    describe('Metodo Salvar', function() {
-        it('deve ser capaz de salvar sem problemas', function(done) {
-            checkin.save(function(err) {
-                should.not.exist(err);
-                return done();
-            });
-        });
-    });
+//     describe('Metodo Salvar', function() {
+//         it('deve ser capaz de salvar sem problemas', function(done) {
+//             checkin.save(function(err) {
+//                 should.not.exist(err);
+//                 return done();
+//             });
+//         });
+//     });
 
-    afterEach(function(done) {
-        Checkin.remove().exec();
-        Estabelecimento.remove().exec();
-        User.remove().exec();
+//     afterEach(function(done) {
+//         Checkin.remove().exec();
+//         Estabelecimento.remove().exec();
+//         User.remove().exec();
 
-        done();
-    });
+//         done();
+//     });
 
-});
+// });

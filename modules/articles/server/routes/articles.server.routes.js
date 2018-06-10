@@ -14,7 +14,7 @@ module.exports = function (app) {
 
   // Articles collection routes
   app.route('/api/articles').all(articlesPolicy.isAllowed)
-    .get(passport.authenticate('jwt', { session: false }), articles.list)
+    .get(articles.list)
     .post(articles.create);
 
   // Single article routes

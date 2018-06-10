@@ -38,7 +38,7 @@
       },
       signin: {
         method: 'POST',
-        url: '/api/auth/signin'
+        url: '/api/auth/authenticate'
       }
     });
 

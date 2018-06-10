@@ -10,16 +10,19 @@ var ProdutoSchema = new Schema({
     default: Date.now
   },
   estabelecimento: {
-  	type: Schema.ObjectId,
-  	ref: 'estabelecimento'
+    type: Schema.ObjectId,
+    ref: 'estabelecimento'
   },
   descricao: {
     type: String,
     required: 'A descricao do produto é requerida.'
   },
   valor: {
-  	type: Number,
-  	required: 'O valor do produto é requerido.'
+    type: Number,
+    required: 'O valor do produto é requerido.'
+  },
+  imagem: {
+    type: String
   }
 });
 

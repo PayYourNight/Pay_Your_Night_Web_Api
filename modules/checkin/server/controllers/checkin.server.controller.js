@@ -6,6 +6,8 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   Checkin = mongoose.model('Checkin'),
+  Estabelecimento = mongoose.model('Estabelecimento'),
+  Usuario = mongoose.model('User'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   _ = require('lodash');
 
@@ -13,15 +15,33 @@ var path = require('path'),
  * Create a Checkin
  */
 exports.create = function (req, res) {
-  var checkin = new Checkin(req.body);
+  var _userId = req.body.usuario;
 
-  checkin.save(function (err) {
-    if (err) {
+  Checkin.findOne({
+    ativo: 'true'
+  }, function (err, checkin) {
+    if (checkin) {
       return res.status(422).send({
-        message: errorHandler.getErrorMessage(err)
+        message: 'Usuário possui um check-in ativo.'
       });
     } else {
-      res.json(checkin);
+      checkin = new Checkin(req.body);
+      var _estabelecimentoId = req.body.estabelecimento;
+      var _userRespId = req.body.usuarioResp;
+
+      checkin.estabelecimento_id = _estabelecimentoId;
+      checkin.usuario_id = _userId;
+      checkin.usuarioResp_id = _userRespId;
+
+      checkin.save(function (err) {
+        if (err) {
+          return res.status(422).send({
+            message: errorHandler.getErrorMessage(err)
+          });
+        } else {
+          res.json(checkin);
+        }
+      });
     }
   });
 };
@@ -58,25 +78,24 @@ exports.delete = function (req, res) {
  * List of Checkins
  */
 exports.list = function (req, res) {
-  Checkin.find().sort('-created').populate('user', 'displayName').exec(function (err, checkin) {
-    if (err) {
-      return res.status(422).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    } else {
-      res.json(checkin);
-    }
-  });
+  Checkin.find()
+    .sort('-created')
+    .populate('usuario')
+    .exec(function (err, checkin) {
+      if (err) {
+        return res.status(422).send({
+          message: errorHandler.getErrorMessage(err)
+        });
+      } else {
+        res.json(checkin);
+      }
+    });
 };
 
-/**
- * Article middleware
- */
 exports.checkinByID = function (req, res, next, id) {
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
-      message: 'Check-in is invalid'
+      message: 'Check-in id is invalid'
     });
   }
 
@@ -84,8 +103,8 @@ exports.checkinByID = function (req, res, next, id) {
     if (err) {
       return next(err);
     } else if (!checkin) {
-      return res.status(404).send({
-        message: 'No article with that identifier has been found'
+      return res.status(422).send({
+        message: 'Nenhum check-in encontrado!'
       });
     }
     req.checkin = checkin;

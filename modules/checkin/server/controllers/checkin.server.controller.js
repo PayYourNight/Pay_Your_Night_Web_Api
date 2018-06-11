@@ -18,7 +18,7 @@ var path = require('path'),
  */
 exports.create = function (req, res) {
   
-  var _userId = req.body.usuario;
+  var _userId = req.body.usuario_id;
 
   Checkin.findOne({
     ativo: 'true'
@@ -29,8 +29,8 @@ exports.create = function (req, res) {
       });
     } else {
       checkin = new Checkin(req.body);
-      var _estabelecimentoId = req.body.estabelecimento;
-      var _userRespId = req.body.usuarioResp;
+      var _estabelecimentoId = req.body.estabelecimento_id;
+      var _userRespId = req.body.usuarioResp_id;
 
       checkin.estabelecimento_id = _estabelecimentoId;
       checkin.usuario_id = _userId;

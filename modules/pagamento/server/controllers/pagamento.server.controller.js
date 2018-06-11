@@ -3,20 +3,48 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   Pagamento = mongoose.model('Pagamento'),
+  Checkin = mongoose.model('Checkin'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 exports.create = function (req, res) {
-  var pagamento = new Pagamento(req.body);
+  var _usuarioId = res.body.usuarioId;
+  var _meioPagamentoId = res.body.meioPagamentoId;
 
-  pagamento.save(function (err) {
+  Checkin.findOne({ usuario_id: _usuarioId, ativo: 'true' })
+  .populate('consumo')
+  .exec(function (err, checkin) {
     if (err) {
       return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      res.json(pagamento);
+      if (!checkin) {
+        return res.status(422).send({
+          message: 'Nenhum check-in ativo para este usuário.'
+        });
+      } else {
+        var pagamento = new Pagamento({
+          usuario_id: _usuarioId,
+          meioPagamento_id: _meioPagamentoId,
+          checkin_id: checkin._id // ,
+          // valorTotalConsumido: checkin.consumo.
+        });
+
+        Pagamento.save(function (err) {
+          if (err) {
+            return res.status(422).send({
+              message: errorHandler.getErrorMessage(err)
+            });
+          } else {
+            res.json(pagamento);
+          }
+        });
+      }
     }
   });
+  // var pagamento = new Pagamento(req.body);
+
+
 };
 
 exports.read = function (req, res) {

@@ -9,9 +9,9 @@ var ProdutoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  estabelecimento: {
+  estabelecimento_id: {
     type: Schema.ObjectId,
-    ref: 'estabelecimento'
+    ref: 'Estabelecimento'
   },
   descricao: {
     type: String,

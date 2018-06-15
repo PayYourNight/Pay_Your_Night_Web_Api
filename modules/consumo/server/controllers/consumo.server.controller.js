@@ -18,8 +18,7 @@ exports.add = function (req, res) {
   var _usuarioId = req.body.usuario_id;
   var _usuarioRespId = req.body.usuarioResp_id;
   var _produtoId = req.body.produto_id;
-  console.log(_usuarioId);
-  var _quantidade = req.body.quandidade;
+  var _quantidade = req.body.quantidade;
 
   Checkin.findOne({
     usuario_id: _usuarioId,
@@ -38,7 +37,9 @@ exports.add = function (req, res) {
             message: 'Não existe consumo cadastrado para o usuário.'
           });
         } else {
-          Produto.findById(_produtoId, function (err, produto) {
+          console.log(_produtoId);
+          Produto.findOne({ _id: _produtoId }, function (err, produto) {
+            console.log(err);
             if (!produto) {
               return res.status(422).send({
                 message: 'Produto não encontrado.'
@@ -50,13 +51,18 @@ exports.add = function (req, res) {
                 $push: {
                   produtosConsumo: {
                     produto_id: _produtoId,
-                    quantidade: _quantidade
+                    quantidade: _quantidade,
+                    valor: produto.valor
                   }
                 }
               }, {
                 new: false
               }, function (err) {
-                if (!err) {
+                if (err) {
+                  return res.status(422).send({
+                    message: errorHandler.getErrorMessage(err)
+                  });
+                } else {
                   res.json(consumo);
                 }
               });
@@ -93,5 +99,12 @@ exports.delete = function (req, res) {
  * List of Consumos
  */
 exports.list = function (req, res) {
+
+};
+
+/**
+ * List of Consumos
+ */
+exports.getVWConsumo = function (req, res) {
 
 };

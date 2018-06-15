@@ -13,7 +13,26 @@ var path = require('path'),
  * Create a Produto
  */
 exports.create = function (req, res) {
+  var _estabelecimento_id = req.body.estabelecimento_id;
+  var _descricao = req.body.descricao;
+  var _valor = req.body.valor;
+  var _imagem_url = req.body.imagem_url;
+  var produto = new Produto();
 
+  produto.estabelecimento_id = _estabelecimento_id;
+  produto.descricao = _descricao;
+  produto.valor = _valor;
+  produto.imagem_url = _imagem_url;
+  Produto.create(produto, function (err, produto) {
+
+    if (err) {
+      return res.status(422).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      res.json(produto);
+    }
+  });
 };
 
 /**
@@ -58,7 +77,6 @@ exports.list = function (req, res) {
 };
 
 exports.produtoByID = function (req, res, next, id) {
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
       message: 'Id do Pagamento é Invalido'

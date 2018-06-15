@@ -25,7 +25,7 @@ var PagamentoSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'Consumo'
   },
-  meioPagamento: {
+  meioPagamento_id: {
     type: Schema.ObjectId,
     ref: 'MeioPagamento'
   },

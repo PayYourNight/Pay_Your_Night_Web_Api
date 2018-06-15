@@ -13,16 +13,17 @@ var ConsumoSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'Checkin'
   },
-  usuarioResp: Schema.Types.ObjectId,
+  usuarioResp: {
+    type: Schema.ObjectId,
+    ref: 'User'
+  },
   produtosConsumo: [{
-    produto_id: Schema.Types.ObjectId,
+    produto_id: {
+      type: Schema.ObjectId,
+      ref: 'Produto'
+    },
     quantidade: Number,
-    // quantidade: {
-    //   type: Number,
-    //   require: function (q) {
-    //     return q > 0;
-    //   }
-    // },
+    valor: Number,
     created: {
       type: Date,
       default: Date.now

@@ -18,4 +18,4 @@ var MemoriaCalculoSchema = new Schema({
   }
 });
 
-mongoose.model('Pagamento', PagamentoSchema);
+mongoose.model('MemoriaCalculo', MemoriaCalculoSchema);

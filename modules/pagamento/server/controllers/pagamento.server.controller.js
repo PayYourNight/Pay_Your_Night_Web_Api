@@ -7,8 +7,8 @@ var path = require('path'),
   Checkin = mongoose.model('Checkin'),
   Consumo = mongoose.model('Consumo'),
   MemoriaCalculo = mongoose.model('MemoriaCalculo'),
-  Parametro = mongoose.model('Parametro'),
-  Saldo = mongoose.model('Saldo'),
+  Parametros = mongoose.model('Parametros'),
+  SaldoPontuacao = mongoose.model('SaldoPontuacao'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 exports.create = function (req, res) {
@@ -43,10 +43,10 @@ exports.create = function (req, res) {
                 message: errorHandler.getErrorMessage(err)
               });
             } else {
-            
+
               if (pag.discriminator === 'pagamentoApp') {
-                await gerarPontuacao(pag);
-                await gravarMemoriaCalculo(pag);
+                gravarMemoriaCalculo(pag);
+                gerarPontuacao(pag);
               }
               res.json(pag);
             }
@@ -57,21 +57,34 @@ exports.create = function (req, res) {
   });
 };
 
-async function gerarPontuacao(pagamento) {
-  const param = await getParameter();
-  var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito
+function gerarPontuacao(pagamento) {
+ // const param =  getParameter();
+  Parametros.findOne({})
+  .exec(function (err, param) {
+    var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
+
+    MemoriaCalculo.findOne({ pagamento_id: pagamento._id }, function (err, memoria) {
+      var saldoPontuacao = new SaldoPontuacao();
+      saldoPontuacao.memoriaCalculo = memoria;
+      saldoPontuacao.valorMovimentado = saldo;
+      saldoPontuacao.tipoMovimentacao = 'pagamento';
+      saldoPontuacao.create(saldoPontuacao);
+    });
+  });
 }
 
-async function getParameter() {  
-   return await Parametro.findOne({}).exec();
-}
+// async function getParameter() {  
+//    return await Parametro.findOne({}).exec();
+// }
 
-function gravarMemoriaCalculo() {
-  const param = await getParameter(); //await Parametro.findOne({}).exec();
-  var memoriaCalculo = new MemoriaCalculo();
-  memoriaCalculo.pagamento_id = pagamento._id;
-  memoriaCalculo.taxaConversao = param.taxaConversaoPagamentoCredito;
-  await MemoriaCalculo.create(memoriaCalculo);  
+function gravarMemoriaCalculo(pag) {
+  Parametro.findOne({})
+  .exec(function (err, param) {
+    var memoriaCalculo = new MemoriaCalculo();
+    memoriaCalculo.pagamento_id = pag._id;
+    memoriaCalculo.taxaConversao = param.taxaConversaoPagamentoCredito;
+    MemoriaCalculo.create(memoriaCalculo);
+  });
 }
 
 exports.read = function (req, res) {

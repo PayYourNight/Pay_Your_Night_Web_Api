@@ -93,7 +93,7 @@ module.exports = function (app, db) {
         // Set the Socket.io session information
         socket.request.session = session;
 
-        // Use Passport to populate the user details
+        //Use Passport to populate the user details
         passport.initialize()(socket.request, {}, function () {
           passport.session()(socket.request, {}, function () {
             if (socket.request.user) {
@@ -111,19 +111,20 @@ module.exports = function (app, db) {
   io.on('connection', function (socket) {
     config.files.server.sockets.forEach(function (socketConfiguration) {
       require(path.resolve(socketConfiguration))(io, socket);
-      users[socket.id] = socket;
-      console.log('A new conection has connected with the id ' + socket.id);
+      //users[socket.id] = socket;
+      console.log('Uma nova conexao com id ' + socket.id);
     });
 
-    // socket.on('checkin', function () {
-    //   console.log('checkin registrado');
-    //   io.emit('checkin', {
-    //     type: 'status',
-    //     text: 'check-in realizado!',
-    //     created: Date.now(),
-    //     username: socket.request.user.username
-    //   });
-    // });
+    socket.on('checkin', function (message) {
+      console.log('checkin registrado');
+      io.emit('checkin', {
+        type: 'checkin',
+        text: 'check-in realizado!',
+        created: Date.now(),
+        username: socket.request.user.username,
+        estabelecimento: message.estabelecimento
+      });
+    });
 
     socket.on('checkout', function () {
       console.log('checkout registrado');
@@ -145,8 +146,8 @@ module.exports = function (app, db) {
     //   });
     // });
 
-    socket.on('disconnect', function () {
-      console.log('desconectado ' + socket.id);
+    //socket.on('disconnect', function () {
+      //console.log('desconectado ' + socket.id);
       // io.emit('chatMessage', {
       //   type: 'status',
       //   text: 'disconnected',
@@ -154,7 +155,7 @@ module.exports = function (app, db) {
       //   profileImageURL: socket.request.user.profileImageURL,
       //   username: socket.request.user.username
       // });
-    });
+    //});
   });
 
   return server;

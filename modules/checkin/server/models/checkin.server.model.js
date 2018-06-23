@@ -9,16 +9,15 @@ var CheckinSchema = new Schema({
     default: Date.now
   },
   usuario: {
-    type: Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  usuarioResp: {
-    type: Schema.ObjectId,
-    ref: 'User'
-  },
-  estabelecimento: {
-    type: Schema.ObjectId,
-    ref: 'Estabelecimento'
+  usuario_id: Schema.Types.ObjectId,
+  usuarioResp_id: Schema.Types.ObjectId,
+  estabelecimento_id: Schema.Types.ObjectId,
+  ativo: {
+    type: Boolean,
+    default: true
   }
 });
 

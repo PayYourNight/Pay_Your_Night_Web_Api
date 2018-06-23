@@ -144,7 +144,25 @@ var UserSchema = new Schema({
     }],
     default: ['mobile'],
     required: 'Please provide at least one platform'
-  }
+  },
+  meiosPagamento: [{
+    cart_numero: {
+      type: String
+    },
+    cart_nome: {
+      type: String
+    },
+    cart_bandeira: {
+      type: String,
+      enum: ['Visa', 'Master', 'Dinners', 'American']
+    },
+    cart_cod_seg: {
+      type: String
+    },
+    cart_data_val: {
+      type: String
+    }
+  }]
 });
 
 /**
@@ -188,7 +206,7 @@ UserSchema.methods.hashPassword = function (password) {
 /**
  * Create instance method for authenticating user
  */
-UserSchema.methods.authenticate = function (password, hash) {  
+UserSchema.methods.authenticate = function (password, hash) {
   return this.password === this.hashPassword(password);
 };
 

@@ -1,25 +1,25 @@
-//'use strict';
+// 'use strict';
 
-///**
+/// **
 // * Module dependencies.
 // */
-//var should = require('should'),
+// var should = require('should'),
 //  mongoose = require('mongoose'),
 //  User = mongoose.model('User'),
 //  path = require('path'),
 //  config = require(path.resolve('./config/config'));
 
-///**
+/// **
 // * Globals
 // */
-//var user1,
+// var user1,
 //  user2,
 //  user3;
 
-///**
+/// **
 // * Unit tests
 // */
-//describe('User Model Unit Tests:', function () {
+// describe('User Model Unit Tests:', function () {
 
 //  before(function () {
 //    user1 = {

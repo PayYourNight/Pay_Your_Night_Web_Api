@@ -67,7 +67,8 @@
 
     function onUserSignupSuccess(response) {
       // If successful we assign the response to the global user model
-      vm.authentication.user = response;
+      console.log(response);
+      vm.authentication.user = response.user;
       Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Signup successful!' });
       // And redirect to the previous or home page
       $state.go($state.previous.state.name || 'home', $state.previous.params);
@@ -79,8 +80,8 @@
 
     function onUserSigninSuccess(response) {
       // If successful we assign the response to the global user model
-      vm.authentication.user = response;
-      Notification.info({ message: 'Welcome ' + response.firstName });
+      vm.authentication.user = response.user;
+      Notification.info({ message: 'Welcome ' + response.user.firstName });
       // And redirect to the previous or home page
       $state.go($state.previous.state.name || 'home', $state.previous.params);
     }

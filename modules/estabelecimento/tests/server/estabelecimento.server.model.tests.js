@@ -1,55 +1,55 @@
-/* eslint-disable */
-'use strict';
+// /* eslint-disable */
+// 'use strict';
 
-var should = require('should'),
-    mongoose = require('mongoose'),
-    Estabelecimento = mongoose.model('Estabelecimento');
+// var should = require('should'),
+//     mongoose = require('mongoose'),
+//     Estabelecimento = mongoose.model('Estabelecimento');
 
-var estabelecimento;
+// var estabelecimento;
 
-describe('Estabelecimento Model Unit Tests:', function () {
-  beforeEach(function (done) {
+// describe('Estabelecimento Model Unit Tests:', function () {
+//   beforeEach(function (done) {
 
-    estabelecimento = new Estabelecimento({
-      nome: 'Estabelecimento 01',
-      cnpj: '12646096000149'
-    });
+//     estabelecimento = new Estabelecimento({
+//       nome: 'Estabelecimento 01',
+//       cnpj: '12646096000149'
+//     });
 
-    done();
-  });
+//     done();
+//   });
 
-  describe('Método Salvar', function () {
-    it('Deve ser capaz de cadastrar um estabelecimento sem falhas', function (done) {
-      
-      estabelecimento.save(function (err) {
-        should.not.exist(err);
-        return done();
-      });
-    });
+//   describe('Método Salvar', function () {
+//     it('Deve ser capaz de cadastrar um estabelecimento sem falhas', function (done) {
 
-    it('Não deve ser capaz de cadastrar um Estabelecimento sem o nome', function (done) {
-      
-      estabelecimento.nome = '';
+//       estabelecimento.save(function (err) {
+//         should.not.exist(err);
+//         return done();
+//       });
+//     });
 
-      estabelecimento.save(function (err) {
-        should.exist(err);
-        return done();
-      });
-    });
+//     it('Não deve ser capaz de cadastrar um Estabelecimento sem o nome', function (done) {
 
-    it('Não deve ser capaz de cadastrar um Estabelecimento sem o CNPJ', function (done) {
+//       estabelecimento.nome = '';
 
-      estabelecimento.cnpj = '';
+//       estabelecimento.save(function (err) {
+//         should.exist(err);
+//         return done();
+//       });
+//     });
 
-      estabelecimento.save(function (err) {
-        should.exist(err);
-        return done();
-      });
-    });
-  });
+//     it('Não deve ser capaz de cadastrar um Estabelecimento sem o CNPJ', function (done) {
 
-  afterEach(function (done) {
-    Estabelecimento.remove().exec();
-    done();
-  });
-});
+//       estabelecimento.cnpj = '';
+
+//       estabelecimento.save(function (err) {
+//         should.exist(err);
+//         return done();
+//       });
+//     });
+//   });
+
+//   afterEach(function (done) {
+//     Estabelecimento.remove().exec();
+//     done();
+//   });
+// });

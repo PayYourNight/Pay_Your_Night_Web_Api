@@ -72,7 +72,6 @@ exports.requiresLoginToken = function (req, res, next) {
   // verifies secret and checks exp
   jwt.verify(loginToken, secret, function (err, decoded) {
     if (err) {
-      console.log(err);
       return res.status(401).send({
         message: 'Failed to authenticate token.'
       });

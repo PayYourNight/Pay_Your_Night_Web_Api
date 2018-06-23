@@ -8,8 +8,8 @@ var should = require('should'),
 var estabelecimento,
   produto;
 
-describe('Produto Model Unit Tests:', function() {
-  beforeEach(function(done) {
+describe('Produto Model Unit Tests:', function () {
+  beforeEach(function (done) {
 
     estabelecimento = new Estabelecimento({
       nome: 'estabelecimento 1',
@@ -17,11 +17,12 @@ describe('Produto Model Unit Tests:', function() {
     });
 
     estabelecimento.save()
-    .then(function() {
+    .then(function () {
       produto = new Produto({
         estabelecimento: estabelecimento,
         descricao: 'Heineken 600',
-        valor: 10
+        valor: 10,
+        imagem: 'asasdasdasdasdasdasdasdasd'
       });
 
       done();
@@ -29,16 +30,52 @@ describe('Produto Model Unit Tests:', function() {
     .catch(done);
   });
 
-  describe('Método Salvar', function() {
-    it('Deve ser capaz de salvar sem problemas', function(done) {
-      produto.save(function(err) {
+  describe('Método Listar', function () {
+    it('Deve ser capaz de listar sem problemas', function (done) {
+      produto = new Produto({
+        estabelecimento: estabelecimento,
+        descricao: 'Heineken 600',
+        valor: 10,
+        imagem: 'asasdasdasdasdasdasdasdasd'
+      });
+      Produto.save(produto);
+
+      produto = new Produto({
+        estabelecimento: estabelecimento,
+        descricao: 'Heineken1 6001',
+        valor: 10,
+        imagem: 'asasdasdasdasdasdasdasdasd'
+      });
+      Produto.save(produto);
+
+      produto = new Produto({
+        estabelecimento: estabelecimento,
+        descricao: 'Heineken1 6005',
+        valor: 10,
+        imagem: 'asasdasdasdasdasdasdasdasd'
+      });
+
+      Produto.save(produto);
+
+      Produto.find({}, function (err, produtos) {
+        should.not.exist(err);
+        should.exist(produtos);
+        return done();
+      });
+    });
+  });
+
+
+  describe('Método Salvar', function () {
+    it('Deve ser capaz de salvar sem problemas', function (done) {
+      produto.save(function (err) {
         should.not.exist(err);
         return done();
       });
     });
   });
 
-  afterEach(function(done) {
+  afterEach(function (done) {
     Produto.remove().exec()
     .then(Estabelecimento.remove().exec())
     .then(done())

@@ -9,7 +9,6 @@ var _ = require('lodash'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   User = mongoose.model('User'),
-  Estabelecimento = mongoose.model('Estabelecimento'),
   jwt = require('jsonwebtoken');
 
 var secret = 'keepitquiet';
@@ -75,32 +74,30 @@ exports.authenticate = function (req, res, next) {
   const username = req.body.usernameOrEmail;
   const password = req.body.password;
 
-  Estabelecimento.findOne({}).then(function (err, estabelecimento) {
-    console.log(estabelecimento);
-    User.findOne({ 'username': username }, function (err, user) {
-      if (err) throw err;
-      if (!user) {
-        return res.status(400).send({ sucess: false, message: 'User not found' }); // res.json({ sucess: false, message: 'User not found' });
-      }
+  User.findOne({ 'username': username }, function (err, user) {
+    if (err) throw err;
+    if (!user) {
+      return res.status(400).send({ sucess: false, message: 'User not found' }); // res.json({ sucess: false, message: 'User not found' });
+    }
 
-      if (!user.authenticate(password)) {
-        return res.status(400).send({ sucess: false, message: 'Wrong Password' });
-      } else {
-        const token = jwt.sign(user.toJSON(), 'secret', {
-          expiresIn: 604800
-        });
+    if (!user.authenticate(password)) {
+      return res.status(400).send({ sucess: false, message: 'Wrong Password' });
+    } else {
+      const token = jwt.sign(user.toJSON(), 'secret', {
+        expiresIn: 604800
+      });
 
-        user.password = undefined;
-        user.salt = undefined;
+      user.password = undefined;
+      user.salt = undefined;
 
-        res.json({
-          sucess: true,
-          token: 'JWT ' + token,
-          user: user
-        });
-      }
-    });
+      res.json({
+        sucess: true,
+        token: 'JWT ' + token,
+        user: user
+      });
+    }
   });
+  
 };
 
 /**

@@ -119,7 +119,7 @@ var UserSchema = new Schema({
     type: Date,
     default: Date.now
   },
-    /* For user login */
+  /* For user login */
   loginToken: {
     type: String
   },
@@ -133,17 +133,16 @@ var UserSchema = new Schema({
   resetPasswordExpires: {
     type: Date
   },
-  estabelecimento: {
-    type: Schema.ObjectId,
-    ref: 'Estabelecimento'
+  estabelecimento_id: {
+    type: Schema.ObjectId
   },
   platform: {
     type: [{
       type: String,
       enum: ['web', 'mobile']
     }],
-    default: ['mobile'],
-    required: 'Please provide at least one platform'
+    default: ['mobile']//,
+    //required: 'Please provide at least one platform'
   },
   meiosPagamento: [{
     cart_numero: {

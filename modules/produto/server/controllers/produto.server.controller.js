@@ -60,16 +60,13 @@ exports.delete = function (req, res) {
  * List of Produtos
  */
 exports.list = function (req, res) {
-  Produto.find({ estabelecimento_id: mongoose.Types.ObjectId(req.query.estabelecimento_id) })
-  .sort('-descricao')
-  .exec(function (err, produtos) {
-    console.log(produtos);
+  Produto.find({ estabelecimento_id: new mongoose.Types.ObjectId(req.query.estabelecimentoid) })
+    .exec(function (err, produtos) {
     if (err) {
       return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      console.log(produtos);
       res.json(produtos);
     }
   });

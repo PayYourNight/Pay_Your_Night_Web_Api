@@ -60,18 +60,17 @@ exports.delete = function (req, res) {
  * List of Produtos
  */
 exports.list = function (req, res) {
-  // Produto.find({ 'estabelecimento._id': JSON.stringify(req.query.estabelecimento) })
-  Produto.find({})
+  Produto.find({ estabelecimento_id: mongoose.Types.ObjectId(req.query.estabelecimento_id) })
   .sort('-descricao')
-  .exec(function (err, produto) {
-    console.log(produto);
+  .exec(function (err, produtos) {
+    console.log(produtos);
     if (err) {
       return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      console.log(produto);
-      res.json(produto);
+      console.log(produtos);
+      res.json(produtos);
     }
   });
 };

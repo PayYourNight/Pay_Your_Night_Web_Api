@@ -136,15 +136,15 @@ module.exports = function (app, db) {
       });
     });
 
-    // socket.on('consumo', function () {
-    //   console.log('consumo registrado');
-    //   io.emit('consumo', {
-    //     type: 'status',
-    //     text: 'consumo incluido!',
-    //     created: Date.now(),
-    //     username: socket.request.user.username
-    //   });
-    // });
+     socket.on('consumo', function () {
+       console.log('consumo registrado');
+       io.emit('consumo', {
+         type: 'status',
+         text: 'consumo incluido!',
+         created: Date.now(),
+         username: socket.request.user.username
+       });
+     });
 
     //socket.on('disconnect', function () {
       //console.log('desconectado ' + socket.id);

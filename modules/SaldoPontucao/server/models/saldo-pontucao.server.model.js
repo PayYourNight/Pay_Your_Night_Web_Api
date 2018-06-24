@@ -26,7 +26,7 @@ var SaldoPontuacaoSchema = new Schema({
   	type: Number
   },
   tipoMovimentacao:{
-  	type: String;
+  	type: String
   }
 });
 

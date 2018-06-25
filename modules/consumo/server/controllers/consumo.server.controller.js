@@ -43,7 +43,7 @@ exports.create = function (req, res) {
         console.log(item);
         produtoConsumo = new ProdutoConsumo();
         produtoConsumo.produto_id = item.produto_id;
-        produtoConsumo.produto_descricao = item.produtoConsumo;
+        produtoConsumo.produto_descricao = item.produto_descricao;
         produtoConsumo.produto_valor = item.produto_valor;
         produtoConsumo.quantidade = item.quantidade;
 

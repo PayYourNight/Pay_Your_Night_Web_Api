@@ -111,6 +111,21 @@ exports.list = function (req, res) {
     });
 };
 
+exports.getAtivo = function (req, res) {
+  var usuario_id = req.query.usuarioid;
+  
+  Checkin.findOne({ usuario_id: usuario_id, ativo: true }, function (err, checkin) {      
+      if (err) {
+        return res.status(422).send({
+          message: errorHandler.getErrorMessage(err)
+        });
+      } else {
+        res.json(checkin);
+      }
+    });
+};
+
+
 exports.checkinByID = function (req, res, next, id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({

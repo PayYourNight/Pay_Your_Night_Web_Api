@@ -32,4 +32,4 @@ var ProdutoConsumoSchema = new Schema({
     }
 });
 
-mongoose.model('ProdutoConsumo', ProdutoConsumoSchema);
+mongoose.model('ProdutoConsumoTeste', ProdutoConsumoSchema);

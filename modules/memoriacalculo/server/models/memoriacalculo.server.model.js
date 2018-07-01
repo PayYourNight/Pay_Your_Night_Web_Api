@@ -1,4 +1,3 @@
-/* eslint-disable */
 'use strict';
 
 var mongoose = require('mongoose'),
@@ -9,11 +8,18 @@ var MemoriaCalculoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  pagamento_id: { 
-      type: Schema.Types.ObjectId,
-      ref: 'Pagamento' 
-  }, 
-  TaxaConversao: {
+  usuario_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  pagamento_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'Pagamento'
+  },
+  taxaConversaoPagamentoCredito: {
+    type: Number
+  },
+  percentualTransacao: {
     type: Number
   }
 });

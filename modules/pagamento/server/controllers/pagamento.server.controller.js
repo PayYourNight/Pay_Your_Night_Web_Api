@@ -10,6 +10,7 @@ var path = require('path'),
   Parametros = mongoose.model('Parametros'),
   SaldoPontuacao = mongoose.model('SaldoPontuacao'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+  //Transaction = require('mongoose-transactions');
 
 exports.create = function (req, res) {
   var _usuarioId = req.body.usuario_id;
@@ -27,15 +28,14 @@ exports.create = function (req, res) {
           message: 'Nenhum check-in ativo para este usuário.'
         });
       } else {
-        Consumo.findOne({ checkin_id: checkin._id }, function (err, consumo) {
+        Consumo.find({ checkin_id: checkin._id }, function (err, consumos) {
           var pagamento = new Pagamento({
             usuario_id: _usuarioId,
-            meioPagamento_id: _meioPagamentoId,
+            meioPagamento_id: new mongoose.Types.ObjectId(_meioPagamentoId),
             checkin_id: checkin._id,
-            discriminator: _origem === 'usuario'? 'pagamentoCaixa' : 'pagamentoApp',
-            valorTotal: _.sumBy(consumo.produtosConsumo, function (o) {
-              return o.quantidade * o.valor;
-            })
+            discriminator: _origem === 'app' ? 'pagamentoApp' : 'pagamentoCaixa',
+            formaPagamento: 'credito',
+            valorTotal: somarConsumos(consumos)
           });
           Pagamento.create(pagamento, function (err, pag) {
             if (err) {
@@ -43,12 +43,31 @@ exports.create = function (req, res) {
                 message: errorHandler.getErrorMessage(err)
               });
             } else {
-
               if (pag.discriminator === 'pagamentoApp') {
-                gravarMemoriaCalculo(pag);
-                gerarPontuacao(pag);
+
+                Parametros.findOne({})
+                  .exec(function (err, param) {
+                    var memoriaCalculo = new MemoriaCalculo();
+                    memoriaCalculo.pagamento_id = pag._id;
+                    memoriaCalculo.taxaConversaoPagamentoCredito = param.taxaConversaoPagamentoCredito;
+                    memoriaCalculo.percentualTransacao = param.percentualTransacao;
+                    MemoriaCalculo.create(memoriaCalculo, function (err, memoria) {
+
+                      var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
+
+                      var saldoPontuacao = new SaldoPontuacao();
+                      saldoPontuacao.usuario_id = _usuarioId;
+                      saldoPontuacao.memoriaCalculo_id = memoria._id;
+                      saldoPontuacao.valorMovimentado = saldo;
+                      saldoPontuacao.tipoMovimentacao = 'pagamento';
+                      SaldoPontuacao.create(saldoPontuacao, function (err) {
+
+                        res.json(pag);
+
+                      });
+                    });
+                  });
               }
-              res.json(pag);
             }
           });
         });
@@ -56,6 +75,17 @@ exports.create = function (req, res) {
     }
   });
 };
+
+function somarConsumos(consumos) {
+  var soma = 0;
+  _.each(consumos, function (x) {
+    _.each(x.produtosConsumo, function (y) {
+      soma += y.produto_valor;
+    });
+  });
+
+  return soma;
+}
 
 function gerarPontuacao(pagamento) {
  // const param =  getParameter();
@@ -68,7 +98,7 @@ function gerarPontuacao(pagamento) {
       saldoPontuacao.memoriaCalculo = memoria;
       saldoPontuacao.valorMovimentado = saldo;
       saldoPontuacao.tipoMovimentacao = 'pagamento';
-      saldoPontuacao.create(saldoPontuacao);
+      return saldoPontuacao.create(saldoPontuacao);
     });
   });
 }
@@ -83,7 +113,7 @@ function gravarMemoriaCalculo(pag) {
     var memoriaCalculo = new MemoriaCalculo();
     memoriaCalculo.pagamento_id = pag._id;
     memoriaCalculo.taxaConversao = param.taxaConversaoPagamentoCredito;
-    MemoriaCalculo.create(memoriaCalculo);
+    return MemoriaCalculo.create(memoriaCalculo);
   });
 }
 

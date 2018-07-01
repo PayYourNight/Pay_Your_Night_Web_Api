@@ -30,18 +30,10 @@ var PagamentoSchema = new Schema({
     ref: 'MeioPagamento'
   },
   discriminator: {
-    type: [{
-      type: String,
-      enum: ['pagamentoCaixa', 'pagamentoApp']
-    }],
-    default: ['pagamentoApp']
+    type: String,
   },
   formaPagamento: {
-    type: [{
-      type: String,
-      enum: ['dinheiro', 'credito', 'debito', 'paypal']
-    }],
-    default: ['credito']
+    type: String
   },
   valorTotal: {
     type: Number,

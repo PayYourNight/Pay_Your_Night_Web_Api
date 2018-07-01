@@ -14,7 +14,7 @@ var SaldoPontuacaoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  usuario: {
+  usuario_id: {
     type: Schema.ObjectId,
     ref: 'User'
   },

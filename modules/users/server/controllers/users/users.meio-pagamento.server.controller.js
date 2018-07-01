@@ -33,7 +33,7 @@ exports.addMeioPagamento = function (req, res) {
         });
 
         Usuario.update({
-          _id: _usuario_id
+          _id: new mongoose.Types.ObjectId(_usuario_id)
         }, {
           $push: {
             meiosPagamento: {
@@ -52,7 +52,14 @@ exports.addMeioPagamento = function (req, res) {
               message: errorHandler.getErrorMessage(err)
             });
           } else {
-            res.json(usuario);
+            Usuario.find({ '_id': new mongoose.Types.ObjectId(usuario._id) }, function (err, usu) {
+              if (!err) {
+                usu.salt = undefined;
+                usu.password = undefined
+                usu.email = undefined;
+                res.json(usu);
+              }
+             })
           }
         });
       }

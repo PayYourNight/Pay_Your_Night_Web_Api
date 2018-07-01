@@ -108,10 +108,9 @@ module.exports = function (app, db) {
   });
 
   // Add an event listener to the 'connection' event
-  io.on('connection', function (socket) {
+  io.on('connection', function (socket) {    
     config.files.server.sockets.forEach(function (socketConfiguration) {
-      require(path.resolve(socketConfiguration))(io, socket);
-      //users[socket.id] = socket;
+      require(path.resolve(socketConfiguration))(io, socket);      
       console.log('Uma nova conexao com id ' + socket.id);
     });
 

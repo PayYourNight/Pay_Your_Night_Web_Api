@@ -8,7 +8,7 @@ var _ = require('lodash'),
   User = mongoose.model('User'),
   jwt = require('jsonwebtoken');
 
-var secret = 'keepitquiet';
+var secret = 'secret';
 
 /**
  * User middleware
@@ -42,7 +42,11 @@ exports.requiresLogin = function (req, res, next) {
  */
 exports.requiresLoginToken = function (req, res, next) {
   // check for login token here
-  var loginToken = req.user.loginToken;
+  console.log("authorization");
+  console.log(req.headers.authorization);
+  var loginToken = req.headers.authorization;
+
+  loginToken = loginToken.replace("JWT ", "");
 
   // query DB for the user corresponding to the token and act accordingly
   /*    User.findOne({

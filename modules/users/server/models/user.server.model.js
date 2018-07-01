@@ -107,7 +107,7 @@ var UserSchema = new Schema({
   roles: {
     type: [{
       type: String,
-      enum: ['user', 'admin']
+      enum: ['user', 'admin', 'backoffice', 'admestab', 'caixa', 'bar', 'staff']
     }],
     default: ['user'],
     required: 'Please provide at least one role'
@@ -137,10 +137,10 @@ var UserSchema = new Schema({
     type: Schema.ObjectId
   },
   platform: {
-    type: [{
+    type: {
       type: String,
       enum: ['web', 'mobile']
-    }],
+    },
     default: ['mobile']//,
     //required: 'Please provide at least one platform'
   },
@@ -208,6 +208,11 @@ UserSchema.methods.hashPassword = function (password) {
 UserSchema.methods.authenticate = function (password, hash) {
   return this.password === this.hashPassword(password);
 };
+
+//UserSchema.methods.roleVerify = function (isEstabelecimento) {
+//  var estabelecimneto = isEstabelecimento && ['admestab', 'backoffice', 'caixa', 'bar', 'staff'].includes(this.roles);
+//  var usuario = isEstabelecimento && ['user'].includes(this.roles);
+//};
 
 /**
  * Find possible not used username

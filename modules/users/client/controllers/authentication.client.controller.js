@@ -41,13 +41,13 @@
     }
 
     function signin(isValid) {
-
+      console.log('teste1');
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'vm.userForm');
 
         return false;
       }
-
+      console.log('teste2');
       UsersService.userSignin(vm.credentials)
         .then(onUserSigninSuccess)
         .catch(onUserSigninError);
@@ -79,6 +79,7 @@
     }
 
     function onUserSigninSuccess(response) {
+      console.log(response);
       // If successful we assign the response to the global user model
       vm.authentication.user = response.user;
       Notification.info({ message: 'Welcome ' + response.user.firstName });
@@ -87,6 +88,7 @@
     }
 
     function onUserSigninError(response) {
+      console.log(response);
       Notification.error({ message: response.data.message, title: '<i class="glyphicon glyphicon-remove"></i> Signin Error!', delay: 6000 });
     }
   }

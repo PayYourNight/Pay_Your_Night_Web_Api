@@ -21,6 +21,9 @@ var ProdutoSchema = new Schema({
     type: Number,
     required: 'O valor do produto é requerido.'
   },
+  unidade: {
+    type: String
+  },
   imagem: {
     type: String
   }

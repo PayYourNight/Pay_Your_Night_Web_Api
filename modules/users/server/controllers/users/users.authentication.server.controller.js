@@ -73,6 +73,7 @@ exports.signin = function (req, res, next) {
 exports.authenticate = function (req, res, next) {
   const username = req.body.usernameOrEmail;
   const password = req.body.password;
+  const isEsbalecimentoApp = req.body.isEsbalecimentoApp;
 
   User.findOne({ 'username': username }, function (err, user) {
     if (err) throw err;
@@ -89,12 +90,22 @@ exports.authenticate = function (req, res, next) {
 
       user.password = undefined;
       user.salt = undefined;
+      user.meiosPagamento = undefined;
+      user.loginToken = token;
 
-      res.json({
-        sucess: true,
-        token: 'JWT ' + token,
-        user: user
+      req.login(user, function (err) {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          res.json({ user: user });
+        }
       });
+
+      //res.json({
+      //  sucess: true,
+      //  token: 'JWT ' + token,
+      //  user: user
+      //});
     }
   });
   
@@ -103,7 +114,7 @@ exports.authenticate = function (req, res, next) {
 /**
  * Signin after passport authentication
  */
-// exports.signin = function (req, res, next) {
+//exports.authenticate = function (req, res, next) {
 //   passport.authenticate('local', function (err, user, info) {
 //     if (err || !user) {
 //       res.status(400).send(info);
@@ -116,6 +127,7 @@ exports.authenticate = function (req, res, next) {
 //         if (err) {
 //           res.status(400).send(err);
 //         } else {
+//           console.log(user)
 //           res.json(user);
 //         }
 //       });

@@ -243,39 +243,6 @@ module.exports.configureSocketIO = function (app, db) {
 module.exports.init = function (db) {
   // Initialize express app
   var app = express();
-  var expressSwagger = require('express-swagger-generator')(app);
-
-  var options = {
-    swaggerDefinition: {
-      info: {
-        description: 'This is a sample server',
-        title: 'Swagger',
-        version: '1.0.0'
-      },
-      host: 'localhost:3000',
-      basePath: '/api',
-      produces: [
-        'application/json',
-        'application/xml'
-      ],
-      schemes: ['http', 'https'],
-      securityDefinitions: {
-        JWT: {
-          type: 'apiKey',
-          in: 'header',
-          name: 'Authorization',
-          description: ''
-        }
-      }
-    },
-    basedir: app.path.toString(), // app absolute path
-    files: ['../../modules/checkin/server/routes/checkin.server.routes'] // Path to the API handle folder
-  };
-
-  expressSwagger(options);
-
-  // var swaggerUi = require('swagger-ui-express'),
-  //   swaggerDocument = require('./../../swagger.json');
 
   // var router = express.Router();
 

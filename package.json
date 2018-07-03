@@ -111,7 +111,6 @@
   },
   "devDependencies": {
     "coveralls": "~2.13.0",
-    "express-swagger-generator": "^1.1.4",
     "gulp-istanbul": "~1.1.1",
     "gulp-mocha": "~3.0.1",
     "gulp-protractor": "~4.0.0",

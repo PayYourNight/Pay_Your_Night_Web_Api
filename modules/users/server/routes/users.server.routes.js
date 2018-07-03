@@ -11,6 +11,8 @@ module.exports = function (app) {
   app.route('/api/users/password').post(users.changePassword);
   app.route('/api/users/picture').post(users.changeProfilePicture);
   app.route('/api/users/meiopagamento').post(users.addMeioPagamento);
+  app.route('/api/users/meiopagamento').get(users.listarMeioPagamento);
+  //app.route('/api/users/meiopagamento/:idmeiopagamento').get(users.detalheMeioPagamento);
   app.route('/api/users/meiopagamento').delete(users.changeProfilePicture);
 
   // Finish by binding the user middleware

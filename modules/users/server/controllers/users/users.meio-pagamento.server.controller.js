@@ -66,3 +66,27 @@ exports.addMeioPagamento = function (req, res) {
     }
   });
 };
+
+exports.listarMeioPagamento = function (req, res) {
+  var _usuario_id = req.query.usuarioid;
+
+  Usuario.findById(_usuario_id, function (err, usu) {
+
+    if (err) {
+      return res.status(422).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      
+      var meiospagamento = usu.meiosPagamento
+
+      res.json(meiospagamento);
+    }
+
+  });
+}
+
+exports.detalheMeioPagamento = function (req, res) {
+  var _usuario_id = req.body.usuario_id;
+  var _meiopagamentoid = req.query.meiopagamentoid;
+}

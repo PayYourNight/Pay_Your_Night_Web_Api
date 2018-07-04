@@ -5,7 +5,7 @@ var checkinPolicy = require('../policies/checkin.server.policy'),
   authorization = require('../../../users/server/controllers/users/users.authorization.server.controller'); //"\users\server\controllers\users\users.authorization.server.controller.js"
 
 module.exports = function (app) {
-  app.route('/api/checkin').all(authorization.requiresLoginToken) // .all(checkinPolicy.isAllowed)
+  app.route('/api/checkin')//.all(authorization.requiresLoginToken) // .all(checkinPolicy.isAllowed)
     .get(checkin.list)    
     .post(checkin.create);
 

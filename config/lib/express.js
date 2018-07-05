@@ -19,7 +19,9 @@ var config = require('../config'),
   hbs = require('express-hbs'),
   path = require('path'),
   _ = require('lodash'),  
-  lusca = require('lusca');
+  lusca = require('lusca'),
+  Raven = require('raven');
+
 
 
 /**
@@ -243,6 +245,27 @@ module.exports.configureSocketIO = function (app, db) {
 module.exports.init = function (db) {
   // Initialize express app
   var app = express();
+
+  // Must configure Raven before doing anything else with it
+  Raven.config('https://ae47bec871b3477b8b1881e5aab43f92@sentry.io/1237020').install();
+
+  // The request handler must be the first middleware on the app
+  app.use(Raven.requestHandler());
+
+  app.get('/', function mainHandler(req, res) {
+    throw new Error('Broke!');
+  });
+
+  // The error handler must be before any other error middleware
+  app.use(Raven.errorHandler());
+
+  // Optional fallthrough error handler
+  app.use(function onError(err, req, res, next) {
+    // The error id is attached to `res.sentry` to be returned
+    // and optionally displayed to the user for support.
+    res.statusCode = 500;
+    res.end(res.sentry + '\n');
+  });
 
   // var router = express.Router();
 

@@ -4,7 +4,8 @@
  * Module dependencies
  */
 var path = require('path'),
-  config = require(path.resolve('./config/config'));
+  config = require(path.resolve('./config/config')),
+  Raven = require('raven');
 
 /**
  * Get unique error field name
@@ -38,6 +39,8 @@ var getUniqueErrorMessage = function (err) {
  */
 exports.getErrorMessage = function (err) {
   var message = '';
+
+  Raven.captureException(err);
 
   if (err.code) {
     switch (err.code) {

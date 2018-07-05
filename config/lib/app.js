@@ -7,7 +7,8 @@ var config = require('../config'),
   mongooseService = require('./mongoose'),
   express = require('./express'),
   chalk = require('chalk'),
-  seed = require('./mongo-seed');
+  seed = require('./mongo-seed'),
+  Raven = require('raven');
 
 function seedDB() {
   if (config.seedDB && config.seedDB.seed) {
@@ -24,8 +25,9 @@ module.exports.init = function init(callback) {
     // Initialize express
     var app = express.init(db);
     if (callback) callback(app, db, config);
-
   });
+
+  Raven.config('https://ae47bec871b3477b8b1881e5aab43f92@sentry.io/1237020').install();
 };
 
 module.exports.start = function start(callback) {

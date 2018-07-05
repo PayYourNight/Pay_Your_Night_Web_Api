@@ -33,9 +33,7 @@ exports.create = function (req, res) {
  */
 exports.read = function (req, res) {
   var usuario_id = req.query.usuarioid;
-  console.log(usuario_id);
-  Saldo.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) }, function (err, saldos) {
-    console.log(saldos);
+  Saldo.find({ usuario_id: usuario_id }, function (err, saldos) {
     if (err) {
       return res.status(422).send({
         message: errorHandler.getErrorMessage(err)

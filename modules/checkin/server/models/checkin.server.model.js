@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose = require('mongoose'),
+  Usuario = mongoose.model('User'),
   Schema = mongoose.Schema;
 
 var CheckinSchema = new Schema({
@@ -8,13 +9,33 @@ var CheckinSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  usuario: {
+  usuario: Usuario,
+  usuario_id: {
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  usuario_id: Schema.Types.ObjectId,
-  usuarioResp_id: Schema.Types.ObjectId,
-  estabelecimento_id: Schema.Types.ObjectId,
+  usuarioResp_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  estabelecimento_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'Estabelecimento'
+  },
+  consumos_incluidos: [{
+    usuario_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  }],
+  consumo_transferido: {
+    type: Boolean,
+    default: false
+  },
+  usuario_transferencia: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
   ativo: {
     type: Boolean,
     default: true

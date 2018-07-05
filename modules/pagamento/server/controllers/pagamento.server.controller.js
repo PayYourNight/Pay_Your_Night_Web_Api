@@ -76,6 +76,68 @@ exports.create = function (req, res) {
   });
 };
 
+exports.incluirConsumo = function (req, res) {
+  var _usuarioId = req.body._usuarioId;
+  var _usuarioInclusao = req.body.usuarioInclusao;
+
+  Usuario.findById(_usuarioInclusao, function (err, usuario) {
+    if (!err) {
+
+      Checkin.findOne({ usuario_id: usuario._id, ativo: 'true' }, function (err, checkin) {
+
+        if (!err) {
+
+          Consumo.find({ checkin_id: checkin._id }, function (err, consumos) {
+
+            Checkin.findOne({ usuario_id: _usuarioId, ativo: 'true' }, function (err, checkinUser) {
+
+              Checkin.update(
+                { _id: checkinUser._id },
+                { $push: { consumos_incluidos: _usuarioInclusao } },
+                function (err, ch) {
+                  if (!err) {
+
+                    checkin.consumo_transferido = true;
+                    checkin.usuario_transferencia = checkinUser.usuario_id;
+                    checkin.save(function (err, c) {
+                      if (!err) {
+                        res.json({
+                          usuario_nome: usuario.displayName,
+                          usuario_id: usuario._id,
+                          totalconsumo: somarConsumos(consumos)
+                        });
+                      } 
+                    });
+
+                  }
+                }
+              );
+            });
+          });
+        }
+      });
+    }
+  });
+}
+
+//exports.removerConsumo = function(req, res) {
+//  var _usuarioId = req.body._usuarioId;
+//  var _usuarioInclusao = req.body.usuarioInclusao;
+
+//  Checkin.findOne({ usuario_id: usuario._id, ativo: 'true' }, function (err, checkin) {
+//    Checkin.update()
+//  });
+
+//  Usuario.findById(_usuarioInclusao, function (err, usuario) {
+//    if (!err) {
+
+
+
+//    }
+
+//  _.findIndex(users, function (o) { return o.user == 'barney'; });
+//}
+
 function somarConsumos(consumos) {
   var soma = 0;
   _.each(consumos, function (x) {

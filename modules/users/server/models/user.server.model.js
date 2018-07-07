@@ -136,6 +136,9 @@ var UserSchema = new Schema({
   estabelecimento_id: {
     type: Schema.ObjectId
   },
+  estabelecimento_nome: {
+    type: String
+  },
   platform: {
     type: {
       type: String,

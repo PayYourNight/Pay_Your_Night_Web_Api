@@ -67,12 +67,16 @@ module.exports = function (app, db) {
     server = https.createServer(options, app);
   } else {
     // Create a new HTTP server
-    server = https.createServer(app);
-    console.log('passou no socket');
+    server = http.createServer(app);
   }
   var socketio = require('socket.io');
   // Create a new Socket.io server
-  var io = socketio.listen(server);
+  var io = socketio.listen(server, {
+    log: false,
+    agent: false,
+    origins: '*:*',
+    transports: ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling', 'polling']
+  });
 
   // Create a MongoDB storage object
   var mongoStore = new MongoStore({

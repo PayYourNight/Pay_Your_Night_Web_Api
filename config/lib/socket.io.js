@@ -117,10 +117,10 @@ module.exports = function (app, db) {
 
   // Add an event listener to the 'connection' event
   io.on('connection', function (socket) {    
-    config.files.server.sockets.forEach(function (socketConfiguration) {
-      require(path.resolve(socketConfiguration))(io, socket);      
-      console.log('Uma nova conexao com id ' + socket.id);
-    });
+    //config.files.server.sockets.forEach(function (socketConfiguration) {
+    //  require(path.resolve(socketConfiguration))(io, socket);      
+    //  console.log('Uma nova conexao com id ' + socket.id);
+    //});
 
     socket.on('checkin', function (message) {
       console.log('checkin registrado');

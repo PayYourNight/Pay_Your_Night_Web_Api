@@ -1,7 +1,6 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-  Usuario = mongoose.model('User'),
   Schema = mongoose.Schema;
 
 var CheckinSchema = new Schema({
@@ -9,7 +8,6 @@ var CheckinSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  usuario: Usuario,
   usuario_id: {
     type: Schema.Types.ObjectId,
     ref: 'User'

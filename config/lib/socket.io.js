@@ -10,8 +10,7 @@ var config = require('../config'),
   passport = require('passport'),
   express = require('express'),
   app = express(),
-  server = require('http').Server(app),
-  socketio = require('socket.io')(server, { origins: '10.109.238.240' }),
+  //server = require('https').Server(app),
   session = require('express-session'),
   MongoStore = require('connect-mongo')(session),
   users = {};
@@ -68,9 +67,10 @@ module.exports = function (app, db) {
     server = https.createServer(options, app);
   } else {
     // Create a new HTTP server
-    server = http.createServer(app);
+    server = https.createServer(app);
     console.log('passou no socket');
   }
+  var socketio = require('socket.io')(server, { origins: '*:*' }),
   // Create a new Socket.io server
   var io = socketio.listen(server);
 

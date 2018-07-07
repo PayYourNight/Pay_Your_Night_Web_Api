@@ -128,7 +128,6 @@ module.exports = function (app, db) {
         type: 'checkin',
         text: 'check-in realizado!',
         created: Date.now(),
-        username: socket.request.user.username,
         estabelecimento: message.estabelecimento
       });
     });
@@ -138,8 +137,7 @@ module.exports = function (app, db) {
       io.emit('checkout', {
         type: 'status',
         text: 'check-out realizado!',
-        created: Date.now(),
-        username: socket.request.user.username
+        created: Date.now()
       });
     });
 
@@ -148,8 +146,7 @@ module.exports = function (app, db) {
        io.emit('consumo', {
          type: 'status',
          text: 'consumo incluido!',
-         created: Date.now(),
-         username: socket.request.user.username
+         created: Date.now()
        });
      });
 

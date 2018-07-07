@@ -70,7 +70,7 @@ module.exports = function (app, db) {
     server = https.createServer(app);
     console.log('passou no socket');
   }
-  var socketio = require('socket.io')(server, { origins: '*:*' }),
+  var socketio = require('socket.io')(server, { origins: '*:*' });
   // Create a new Socket.io server
   var io = socketio.listen(server);
 

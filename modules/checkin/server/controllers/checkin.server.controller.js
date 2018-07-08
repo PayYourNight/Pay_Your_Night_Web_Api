@@ -117,20 +117,26 @@ exports.getAtivo = function (req, res) {
   
   Checkin.findOne({ usuario_id: usuario_id, ativo: true }, function (err, checkin) {      
       if (err) {
-        return res.status(422).send({
+        return res.status(500).send({
           message: errorHandler.getErrorMessage(err)
         });
       } else {
-        Estabelecimento.findById(new mongoose.Types.ObjectId(checkin.estabelecimento_id), function (err, est) {          
-
-          res.json({
-            _id: checkin._id,
-            estabelecimento_id: checkin.estabelecimento_id,
-            estabeleciemento_nome: est.nome,
-            consumo_transferido: checkin.consumo_transferido,
-            consumos_incluidos: checkin.consumos_incluidos
+        if (!checkin) {
+          return res.status(404).send({
+            message: "Nenhum check-in localizado"
           });
-        });        
+        }
+        else {
+          Estabelecimento.findById(new mongoose.Types.ObjectId(checkin.estabelecimento_id), function (err, est) {
+            res.json({
+              _id: checkin._id,
+              estabelecimento_id: checkin.estabelecimento_id,
+              estabeleciemento_nome: est.nome,
+              consumo_transferido: checkin.consumo_transferido,
+              consumos_incluidos: checkin.consumos_incluidos
+            });
+          });
+        }
       }
     });
 };

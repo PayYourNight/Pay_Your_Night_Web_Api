@@ -37,8 +37,7 @@ exports.create = function (req, res) {
       checkin.usuario_id = _userId;
       checkin.usuarioResp_id = _userRespId;
 
-      var consumo = new Consumo({
-        // checkin: checkin,
+      var consumo = new Consumo({        
         usuarioResp_id: _userRespId
       });
 

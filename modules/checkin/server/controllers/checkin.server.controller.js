@@ -28,7 +28,7 @@ exports.create = function (req, res) {
   }, function (err, checkin) {
     if (checkin) {
       return res.status(422).send({
-        message: 'Usuário possui um check-in ativo.'
+        message: 'Usuário possui um check-in ativo. '
       });
     } else {
       checkin = new Checkin(req.body);

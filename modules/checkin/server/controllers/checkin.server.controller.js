@@ -122,7 +122,7 @@ exports.getAtivo = function (req, res) {
         });
       } else {
         if (!checkin) {
-          return res.status(422).send({
+          return res.status(412).send({
             message: "Nenhum check-in localizado"
           });
         }

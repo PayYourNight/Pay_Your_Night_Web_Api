@@ -9,7 +9,7 @@ module.exports = function (app) {
     .get(produtos.list)
     .post(produtos.create);
 
-  app.route('/api/produtos/:produtoId').all(produtoPolicy.isAllowed)
+  app.route('/api/produtos/:produtoId')//.all(produtoPolicy.isAllowed)
     .get(produtos.read);
 
   app.param('produtoId', produtos.produtoByID);

@@ -150,6 +150,15 @@ module.exports = function (app, db) {
        });
      });
 
+    socket.on('pagamento', function () {
+      console.log('pagamento registrado');
+      io.emit('pagamento', {
+        type: 'status',
+        text: 'pagamento incluido!',
+        created: Date.now()
+      });
+    });
+
     //socket.on('disconnect', function () {
       //console.log('desconectado ' + socket.id);
       // io.emit('chatMessage', {

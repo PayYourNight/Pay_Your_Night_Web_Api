@@ -11,6 +11,12 @@ module.exports = function (app) {
     .get(pagamentos.list)
     .post(pagamentos.create);
 
+  app.route('/api/pagamentos/incluirconsumo')
+    .post(pagamentos.incluirConsumo);
+
+  app.route('/api/pagamentos/removerconsumo')
+    .post(pagamentos.removerConsumo);
+
   app.route('/api/pagamentos/:pagamentoId')// .all(pagamentosPolicy.isAllowed)
     .get(pagamentos.read);
 

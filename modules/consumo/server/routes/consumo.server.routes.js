@@ -3,6 +3,7 @@
 var consumo = require('../controllers/consumo.server.controller');
 
 module.exports = function (app) {
+
   app.route('/api/consumo')
     .post(consumo.create);
 

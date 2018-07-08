@@ -23,6 +23,7 @@ exports.create = function (req, res) {
   var _userRespId = req.body.usuarioresp_id;
 
   Checkin.findOne({
+    usuario_id: new mongoose.Types.ObjectId(_userId),
     ativo: 'true'
   }, function (err, checkin) {
     if (checkin) {
@@ -120,11 +121,19 @@ exports.getAtivo = function (req, res) {
           message: errorHandler.getErrorMessage(err)
         });
       } else {
-        res.json(checkin);
+        Estabelecimento.findById(new mongoose.Types.ObjectId(checkin.estabelecimento_id), function (err, est) {          
+
+          res.json({
+            _id: checkin._id,
+            estabelecimento_id: checkin.estabelecimento_id,
+            estabeleciemento_nome: est.nome,
+            consumo_transferido: checkin.consumo_transferido,
+            consumos_incluidos: checkin.consumos_incluidos
+          });
+        });        
       }
     });
 };
-
 
 exports.checkinByID = function (req, res, next, id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {

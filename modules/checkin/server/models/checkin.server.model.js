@@ -21,10 +21,7 @@ var CheckinSchema = new Schema({
     ref: 'Estabelecimento'
   },
   consumos_incluidos: [{
-    usuario_id: {
-      type: Schema.Types.ObjectId,
-      ref: 'User'
-    }
+    usuario_id: String
   }],
   consumo_transferido: {
     type: Boolean,

@@ -9,15 +9,20 @@ var path = require('path'),
   MemoriaCalculo = mongoose.model('MemoriaCalculo'),
   Parametros = mongoose.model('Parametros'),
   SaldoPontuacao = mongoose.model('SaldoPontuacao'),
+  Usuario = mongoose.model('User'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-  //Transaction = require('mongoose-transactions');
+
+//Transaction = require('mongoose-transactions');
 
 exports.create = function (req, res) {
   var _usuarioId = req.body.usuario_id;
   var _meioPagamentoId = req.body.meiopagamento_id;
   var _origem = req.body.origem;
 
-  Checkin.findOne({ usuario_id: _usuarioId, ativo: 'true' }, function (err, checkin) {
+  Checkin.findOne({
+    usuario_id: _usuarioId,
+    ativo: 'true'
+  }, function (err, checkin) {
     if (err) {
       return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
@@ -28,7 +33,9 @@ exports.create = function (req, res) {
           message: 'Nenhum check-in ativo para este usuário.'
         });
       } else {
-        Consumo.find({ checkin_id: checkin._id }, function (err, consumos) {
+        Consumo.find({
+          checkin_id: checkin._id
+        }, function (err, consumos) {
           var pagamento = new Pagamento({
             usuario_id: _usuarioId,
             meioPagamento_id: new mongoose.Types.ObjectId(_meioPagamentoId),
@@ -76,67 +83,126 @@ exports.create = function (req, res) {
   });
 };
 
-exports.incluirConsumo = function (req, res) {
-  var _usuarioId = req.body._usuarioId;
-  var _usuarioInclusao = req.body.usuarioInclusao;
+exports.removerConsumo = function (req, res) {
+  var _usuarioId = req.body.usuario_id;
+  var _usuarioInclusao = req.body.usuario_inclusao;
 
-  Usuario.findById(_usuarioInclusao, function (err, usuario) {
+  Checkin.findOne({
+    usuario_id: _usuarioId,
+    ativo: 'true'
+  }, function (err, checkin) {
     if (!err) {
-
-      Checkin.findOne({ usuario_id: usuario._id, ativo: 'true' }, function (err, checkin) {
-
-        if (!err) {
-
-          Consumo.find({ checkin_id: checkin._id }, function (err, consumos) {
-
-            Checkin.findOne({ usuario_id: _usuarioId, ativo: 'true' }, function (err, checkinUser) {
-
-              Checkin.update(
-                { _id: checkinUser._id },
-                { $push: { consumos_incluidos: _usuarioInclusao } },
-                function (err, ch) {
-                  if (!err) {
-
-                    checkin.consumo_transferido = true;
-                    checkin.usuario_transferencia = checkinUser.usuario_id;
-                    checkin.save(function (err, c) {
-                      if (!err) {
-                        res.json({
-                          usuario_nome: usuario.displayName,
-                          usuario_id: usuario._id,
-                          totalconsumo: somarConsumos(consumos)
-                        });
-                      } 
-                    });
-
-                  }
-                }
-              );
+      Checkin.update({
+        _id: checkin._id
+      }, {
+          $pullAll: {
+            consumos_incluidos: [_usuarioInclusao]
+          }
+        },
+        function (err, ch) {
+          if (!err) {
+            Checkin.findOne({
+              usuario_id: _usuarioInclusao,
+              ativo: 'true'
+            }, function (err, c) {
+              c.consumo_transferido = false;
+              c.usuario_transferencia = null;
+              c.save();
             });
-          });
-        }
-      });
+
+            res.json(JSON.stringify({
+              message: 'Consumo removido'
+            }));
+          }
+        });
     }
   });
 }
 
-//exports.removerConsumo = function(req, res) {
-//  var _usuarioId = req.body._usuarioId;
-//  var _usuarioInclusao = req.body.usuarioInclusao;
+exports.incluirConsumo = function (req, res) {
+  var _usuarioId = req.body.usuario_id;
+  var _usuarioInclusao = req.body.usuario_inclusao;
 
-//  Checkin.findOne({ usuario_id: usuario._id, ativo: 'true' }, function (err, checkin) {
-//    Checkin.update()
-//  });
+  Checkin.findOne({
+    usuario_id: _usuarioInclusao,
+    ativo: 'true'
+  }, function (err, checkin) {
+    console.log(checkin);
+    if (err) {
+      return res.status(422).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      if (!checkin) {
+        return res.status(422).send({
+          message: 'Nenhum check-in ativo para este usuário.'
+        });
+      } else {
+        Consumo.find({
+          checkin_id: checkin._id
+        }, function (err, consumos) {
 
-//  Usuario.findById(_usuarioInclusao, function (err, usuario) {
-//    if (!err) {
+          if (err) {
+            return res.status(422).send({
+            message: errorHandler.getErrorMessage(err)
+            });
+          } else {
+            
+            Checkin.findOne({
+              usuario_id: _usuarioId,
+              ativo: 'true'
+            }, function (err, checkinUser) {
+              
+              console.log(checkinUser);
+              if (err) {
+                return res.status(422).send({
+                message: errorHandler.getErrorMessage(err)
+                });
+              } else {
 
+                if (!checkinUser) {
+                  return res.status(422).send({
+                  message: 'Nenhum check-in ativo para este usuário.'
+                  });
 
+                } else {
 
-//    }
+                  Checkin.update({
+                    _id: checkinUser._id
+                  }, {
+                      $push: {
+                        consumos_incluidos: _usuarioInclusao
+                      }
+                    },
 
-//  _.findIndex(users, function (o) { return o.user == 'barney'; });
-//}
+                    function (err, ch) {
+
+                      if (!err) {
+                        checkin.consumo_transferido = true;
+                        checkin.usuario_transferencia = checkinUser.usuario_id;
+                        checkin.save(function (err, c) {
+
+                          Usuario.findById(checkin.usuario_id, function (err, usuario) {
+                            if (usuario) {
+                              res.json(JSON.stringify({
+                                usuario_nome: usuario.displayName,
+                                usuario_id: usuario._id,
+                                totalconsumo: somarConsumos(consumos)
+                              }));
+                            }
+                          });
+                        });
+                      }
+                    });
+                }
+              }
+            });
+          }
+        });
+      }
+    }
+  });
+}
 
 function somarConsumos(consumos) {
   var soma = 0;
@@ -150,33 +216,30 @@ function somarConsumos(consumos) {
 }
 
 function gerarPontuacao(pagamento) {
- // const param =  getParameter();
   Parametros.findOne({})
-  .exec(function (err, param) {
-    var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
+    .exec(function (err, param) {
+      var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
 
-    MemoriaCalculo.findOne({ pagamento_id: pagamento._id }, function (err, memoria) {
-      var saldoPontuacao = new SaldoPontuacao();
-      saldoPontuacao.memoriaCalculo = memoria;
-      saldoPontuacao.valorMovimentado = saldo;
-      saldoPontuacao.tipoMovimentacao = 'pagamento';
-      return saldoPontuacao.create(saldoPontuacao);
+      MemoriaCalculo.findOne({
+        pagamento_id: pagamento._id
+      }, function (err, memoria) {
+        var saldoPontuacao = new SaldoPontuacao();
+        saldoPontuacao.memoriaCalculo = memoria;
+        saldoPontuacao.valorMovimentado = saldo;
+        saldoPontuacao.tipoMovimentacao = 'pagamento';
+        return saldoPontuacao.create(saldoPontuacao);
+      });
     });
-  });
 }
-
-// async function getParameter() {  
-//    return await Parametro.findOne({}).exec();
-// }
 
 function gravarMemoriaCalculo(pag) {
   Parametro.findOne({})
-  .exec(function (err, param) {
-    var memoriaCalculo = new MemoriaCalculo();
-    memoriaCalculo.pagamento_id = pag._id;
-    memoriaCalculo.taxaConversao = param.taxaConversaoPagamentoCredito;
-    return MemoriaCalculo.create(memoriaCalculo);
-  });
+    .exec(function (err, param) {
+      var memoriaCalculo = new MemoriaCalculo();
+      memoriaCalculo.pagamento_id = pag._id;
+      memoriaCalculo.taxaConversao = param.taxaConversaoPagamentoCredito;
+      return MemoriaCalculo.create(memoriaCalculo);
+    });
 }
 
 exports.read = function (req, res) {

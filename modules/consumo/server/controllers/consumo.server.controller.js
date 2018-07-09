@@ -36,42 +36,43 @@ exports.create = function (req, res) {
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-    if (!checkin) {
-      return res.status(412).send({
-        message: 'Usuário não possui um check-in ativo.'
-      });
-    } else {
+      if (!checkin) {
+        return res.status(412).send({
+          message: 'Usuário não possui um check-in ativo.'
+        });
+      } else {
 
-      console.log(checkin);
-      console.log('----------');
-    
-      var consumo = new Consumo();
-      consumo.checkin_id = checkin._id;
-      consumo.usuarioresp_id = _usuarioresp_id;
+        console.log(checkin);
+        console.log('----------');
 
-      var produtoConsumo = ProdutoConsumo();
+        var consumo = new Consumo();
+        consumo.checkin_id = checkin._id;
+        consumo.usuarioresp_id = _usuarioresp_id;
 
-      _produtosConsumo.forEach(function (item) {        
-        produtoConsumo = new ProdutoConsumo();
-        produtoConsumo.produto_id = item.produto_id;
-        produtoConsumo.produto_descricao = item.produto_descricao;
-        produtoConsumo.produto_valor = item.produto_valor;
-        produtoConsumo.quantidade = item.quantidade;
+        var produtoConsumo = ProdutoConsumo();
 
-        consumo.produtosConsumo.push(produtoConsumo);
-      });
+        _produtosConsumo.forEach(function (item) {
+          produtoConsumo = new ProdutoConsumo();
+          produtoConsumo.produto_id = item.produto_id;
+          produtoConsumo.produto_descricao = item.produto_descricao;
+          produtoConsumo.produto_valor = item.produto_valor;
+          produtoConsumo.quantidade = item.quantidade;
 
-      console.log(consumo);
+          consumo.produtosConsumo.push(produtoConsumo);
+        });
 
-      Consumo.create(consumo, function (err, consumo) {
-        if (err) {
-          return res.status(500).send({
-            message: errorHandler.getErrorMessage(err)
-          });
-        } else {
-          res.json(consumo);
-        }
-      });
+        console.log(consumo);
+
+        Consumo.create(consumo, function (err, consumo) {
+          if (err) {
+            return res.status(500).send({
+              message: errorHandler.getErrorMessage(err)
+            });
+          } else {
+            res.json(consumo);
+          }
+        });
+      }
     }
   });
 };

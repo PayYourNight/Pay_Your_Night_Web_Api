@@ -16,10 +16,10 @@ var path = require('path'),
  * Create a Consumo
  */
 exports.create = function (req, res) {
-  var _usuarioId = req.body.usuario_id;
-  var _usuarioRespId = req.body.usuarioResp_id;
+  var _usuarioId = req.body.usuario_id;  
   var _produtosConsumo = req.body.produtosConsumo;
   var _usuarioresp_id = req.body.usuarioresp_id;
+  
 
   Checkin.findOne({
     usuario_id: new mongoose.Types.ObjectId(_usuarioId),
@@ -39,8 +39,7 @@ exports.create = function (req, res) {
 
       var produtoConsumo = ProdutoConsumo();
 
-      _produtosConsumo.forEach(function (item) {
-        console.log(item);
+      _produtosConsumo.forEach(function (item) {        
         produtoConsumo = new ProdutoConsumo();
         produtoConsumo.produto_id = item.produto_id;
         produtoConsumo.produto_descricao = item.produto_descricao;

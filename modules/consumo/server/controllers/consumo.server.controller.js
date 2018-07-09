@@ -20,12 +20,14 @@ exports.create = function (req, res) {
   var _produtosConsumo = req.body.produtosConsumo;
   var _usuarioresp_id = req.body.usuarioresp_id;
 
-  console.log(_usuarioId);
-  console.log('----------');
-  console.log(_produtosConsumo);
-  console.log('----------');
-  console.log(_usuarioresp_id);
-  console.log('----------');
+  console.log(req.body);
+
+  //console.log(_usuarioId);
+  //console.log('----------');
+  //console.log(_produtosConsumo);
+  //console.log('----------');
+  //console.log(_usuarioresp_id);
+  //console.log('----------');
   
   Checkin.findOne({
     usuario_id: new mongoose.Types.ObjectId(_usuarioId),

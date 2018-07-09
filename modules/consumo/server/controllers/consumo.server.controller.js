@@ -19,20 +19,32 @@ exports.create = function (req, res) {
   var _usuarioId = req.body.usuario_id;  
   var _produtosConsumo = req.body.produtosConsumo;
   var _usuarioresp_id = req.body.usuarioresp_id;
-  
 
+  console.log(_usuarioId);
+  console.log('----------');
+  console.log(_produtosConsumo);
+  console.log('----------');
+  console.log(_usuarioresp_id);
+  console.log('----------');
+  
   Checkin.findOne({
     usuario_id: new mongoose.Types.ObjectId(_usuarioId),
     ativo: true
   }, function (err, checkin) {
+    if (err) {
+      return res.status(500).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
     if (!checkin) {
-      return res.status(422).send({
+      return res.status(412).send({
         message: 'Usuário não possui um check-in ativo.'
       });
     } else {
+
       console.log(checkin);
-      console.log(_produtosConsumo);
-     
+      console.log('----------');
+    
       var consumo = new Consumo();
       consumo.checkin_id = checkin._id;
       consumo.usuarioresp_id = _usuarioresp_id;
@@ -49,9 +61,11 @@ exports.create = function (req, res) {
         consumo.produtosConsumo.push(produtoConsumo);
       });
 
+      console.log(consumo);
+
       Consumo.create(consumo, function (err, consumo) {
         if (err) {
-          return res.status(422).send({
+          return res.status(500).send({
             message: errorHandler.getErrorMessage(err)
           });
         } else {

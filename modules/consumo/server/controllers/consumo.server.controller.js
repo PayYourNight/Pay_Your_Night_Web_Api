@@ -22,7 +22,7 @@ exports.create = function (req, res) {
   var _usuarioresp_id = req.body.usuarioresp_id;
 
   Checkin.findOne({
-    usuario_id: _usuarioId,
+    usuario_id: new mongoose.Types.ObjectId(_usuarioId),
     ativo: true
   }, function (err, checkin) {
     if (!checkin) {

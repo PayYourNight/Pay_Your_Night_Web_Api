@@ -22,6 +22,12 @@ exports.create = function (req, res) {
   var _estabelecimentoId = req.body.estabelecimento_id;
   var _userRespId = req.body.usuarioresp_id;
 
+  if (!mongoose.Types.ObjectId.isValid(_estabelecimentoId)) {
+    return res.status(400).send({
+      message: 'Estabelecimento não pode ser nulo'
+    });
+  }
+
   Checkin.findOne({
     usuario_id: new mongoose.Types.ObjectId(_userId),
     ativo: 'true'
@@ -126,14 +132,30 @@ exports.getAtivo = function (req, res) {
           });
         }
         else {
+
+          console.log(checkin);
+
           Estabelecimento.findById(new mongoose.Types.ObjectId(checkin.estabelecimento_id), function (err, est) {
-            res.json({
-              _id: checkin._id,
-              estabelecimento_id: checkin.estabelecimento_id,
-              estabeleciemento_nome: est.nome,
-              consumo_transferido: checkin.consumo_transferido,
-              consumos_incluidos: checkin.consumos_incluidos
-            });
+            if (err) {
+              return res.status(500).send({
+                message: errorHandler.getErrorMessage(err)
+              });
+            } else {
+              if (!est) {
+                return res.status(412).send({
+                  message: "Nenhum estabelecimento localizado"
+                });
+              }
+              else {
+                res.json({
+                  _id: checkin._id,
+                  estabelecimento_id: checkin.estabelecimento_id,
+                  estabeleciemento_nome: est.nome,
+                  consumo_transferido: checkin.consumo_transferido,
+                  consumos_incluidos: checkin.consumos_incluidos
+                });
+              }
+            }
           });
         }
       }

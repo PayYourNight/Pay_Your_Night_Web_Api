@@ -101,12 +101,14 @@ exports.list = function (req, res) {
     usuario_id: _usuarioId,
     ativo: true
   }, function (err, checkin) {
+    console.log(checkin);
     if (!checkin) {
       return res.status(422).send({
         message: 'Usuário não possui um check-in ativo.'
       });
     } else {
       Consumo.find({ checkin_id: checkin._id }, function (err, consumos) {
+        console.log(consumos);
         res.json(consumos);
       });
     }

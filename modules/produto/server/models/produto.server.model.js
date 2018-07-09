@@ -24,7 +24,7 @@ var ProdutoSchema = new Schema({
   unidade: {
     type: String
   },
-  imagem: {
+  imagem_url: {
     type: String
   }
 });

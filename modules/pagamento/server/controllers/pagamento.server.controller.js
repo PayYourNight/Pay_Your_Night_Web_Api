@@ -18,6 +18,7 @@ exports.create = function (req, res) {
   var _usuarioId = req.body.usuario_id;
   var _meioPagamentoId = req.body.meiopagamento_id;
   var _origem = req.body.origem;
+  var _usarpyncoin = req.body.usarpyncoin;
 
   Checkin.findOne({
     usuario_id: _usuarioId,
@@ -36,6 +37,7 @@ exports.create = function (req, res) {
         Consumo.find({
           checkin_id: checkin._id
         }, function (err, consumos) {
+
           var pagamento = new Pagamento({
             usuario_id: _usuarioId,
             meioPagamento_id: new mongoose.Types.ObjectId(_meioPagamentoId),
@@ -44,12 +46,14 @@ exports.create = function (req, res) {
             formaPagamento: 'credito',
             valorTotal: somarConsumos(consumos)
           });
+          
           Pagamento.create(pagamento, function (err, pag) {
             if (err) {
-              return res.status(422).send({
+              return res.status(412).send({
                 message: errorHandler.getErrorMessage(err)
               });
             } else {
+              
               if (pag.discriminator === 'pagamentoApp') {
 
                 Parametros.findOne({})
@@ -59,6 +63,21 @@ exports.create = function (req, res) {
                     memoriaCalculo.taxaConversaoPagamentoCredito = param.taxaConversaoPagamentoCredito;
                     memoriaCalculo.percentualTransacao = param.percentualTransacao;
                     MemoriaCalculo.create(memoriaCalculo, function (err, memoria) {
+
+                      if (_usarpyncoin) {
+                        var saldo = 0;
+                        SaldoPontuacao.find({ usuario_id: new mongoose.Type.ObjectId(_usuarioId) }, function (err, saldos) {
+                          console.log(saldos);
+                          saldoPontos = getTotalSaldo(saldos);
+
+                          var saldoPontuacao = new SaldoPontuacao();
+                          saldoPontuacao.usuario_id = _usuarioId;
+                          saldoPontuacao.memoriaCalculo_id = memoria._id;
+                          saldoPontuacao.valorMovimentado = saldo * -1;
+                          saldoPontuacao.tipoMovimentacao = 'utilizacao';
+                          SaldoPontuacao.create(saldoPontuacao);
+                        });
+                      }
 
                       var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
 
@@ -82,6 +101,15 @@ exports.create = function (req, res) {
     }
   });
 };
+
+function getTotalSaldo(saldos) {
+  var total = 0;
+  saldos.forEach(function (item) {
+    total += item.valorMovimentado;
+  });
+
+  return total;
+}
 
 exports.removerConsumo = function (req, res) {
   var _usuarioId = req.body.usuario_id;

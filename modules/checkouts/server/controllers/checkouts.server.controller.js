@@ -21,14 +21,16 @@ exports.create = function(req, res) {
     Checkin.save(checkin, function (err) {
       if (err) {
         return res.status(500).send({
-          message: errorHandler.getErrorMessage(err)
+          message: errorHandler.getErrorMessage(err),
+          status: 500
         });
       } else {
         checkout.checkin_id = checkin._id;
         checkout.save(function (err) {
           if (err) {
             return res.status(500).send({
-              message: errorHandler.getErrorMessage(err)
+              message: errorHandler.getErrorMessage(err),
+              status: 500
             });
           } else {
             res.jsonp(checkout);
@@ -64,7 +66,8 @@ exports.update = function(req, res) {
   checkout.save(function(err) {
     if (err) {
       return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
+        message: errorHandler.getErrorMessage(err),
+        status: 400
       });
     } else {
       res.jsonp(checkout);
@@ -81,7 +84,8 @@ exports.delete = function(req, res) {
   checkout.remove(function(err) {
     if (err) {
       return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
+        message: errorHandler.getErrorMessage(err),
+        status: 400
       });
     } else {
       res.jsonp(checkout);
@@ -96,7 +100,8 @@ exports.list = function(req, res) {
   Checkout.find().sort('-created').populate('user', 'displayName').exec(function(err, checkouts) {
     if (err) {
       return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
+        message: errorHandler.getErrorMessage(err),
+        status: 400
       });
     } else {
       res.jsonp(checkouts);
@@ -111,7 +116,8 @@ exports.checkoutByID = function(req, res, next, id) {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
-      message: 'Checkout is invalid'
+      message: 'Checkout is invalid',
+      status: 400
     });
   }
 
@@ -120,7 +126,8 @@ exports.checkoutByID = function(req, res, next, id) {
       return next(err);
     } else if (!checkout) {
       return res.status(404).send({
-        message: 'No Checkout with that identifier has been found'
+        message: 'No Checkout with that identifier has been found',
+        status: 404
       });
     }
     req.checkout = checkout;

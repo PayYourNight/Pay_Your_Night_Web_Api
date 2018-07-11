@@ -128,7 +128,8 @@ exports.getAtivo = function (req, res) {
       } else {
         if (!checkin) {
           return res.status(412).send({
-            message: "Nenhum check-in localizado"
+            message: "Nenhum check-in localizado",
+            status: 412
           });
         }
         else {          
@@ -141,7 +142,8 @@ exports.getAtivo = function (req, res) {
             } else {
               if (!est) {
                 return res.status(412).send({
-                  message: "Nenhum estabelecimento localizado"
+                  message: "Nenhum estabelecimento localizado",
+                  status: 412
                 });
               }
               else {

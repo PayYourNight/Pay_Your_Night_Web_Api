@@ -35,18 +35,17 @@ exports.create = function (req, res) {
   }, function (err, checkin) {
     if (err) {
       return res.status(500).send({
-        message: errorHandler.getErrorMessage(err)
+        message: errorHandler.getErrorMessage(err),
+        status: 500
       });
     } else {
       if (!checkin) {
         return res.status(412).send({
-          message: 'Usuário não possui um check-in ativo.'
+          message: 'Usuário não possui um check-in ativo.',
+          status: 412
         });
       } else {
-
-        console.log(checkin);
-        console.log('----------');
-
+       
         var consumo = new Consumo();
         consumo.checkin_id = checkin._id;
         consumo.usuarioresp_id = _usuarioresp_id;
@@ -61,14 +60,13 @@ exports.create = function (req, res) {
           produtoConsumo.quantidade = item.quantidade;
 
           consumo.produtosConsumo.push(produtoConsumo);
-        });
-
-        console.log(consumo);
+        });        
 
         Consumo.create(consumo, function (err, consumo) {
           if (err) {
             return res.status(500).send({
-              message: errorHandler.getErrorMessage(err)
+              message: errorHandler.getErrorMessage(err),
+              status: 500
             });
           } else {
             res.json(consumo);
@@ -119,8 +117,9 @@ exports.list = function (req, res) {
   }, function (err, checkin) {
     console.log(checkin);
     if (!checkin) {
-      return res.status(422).send({
-        message: 'Usuário não possui um check-in ativo.'
+      return res.status(412).send({
+        message: 'Usuário não possui um check-in ativo.',
+        status: 412
       });
     } else {
       Consumo.find({ checkin_id: checkin._id }, function (err, consumos) {

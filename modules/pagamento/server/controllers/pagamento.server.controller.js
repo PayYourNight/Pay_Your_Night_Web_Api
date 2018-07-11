@@ -27,12 +27,14 @@ exports.create = function (req, res) {
   }, function (err, checkin) {
     if (err) {
       return res.status(412).send({
-        message: errorHandler.getErrorMessage(err)
+        message: errorHandler.getErrorMessage(err),
+        status: 412
       });
     } else {
       if (!checkin) {
         return res.status(412).send({
-          message: 'Nenhum check-in ativo para este usuário.'
+          message: 'Nenhum check-in ativo para este usuário.',
+          status: 412
         });
       } else {
         Consumo.find({
@@ -51,7 +53,8 @@ exports.create = function (req, res) {
           Pagamento.create(pagamento, function (err, pag) {
             if (err) {
               return res.status(412).send({
-                message: errorHandler.getErrorMessage(err)
+                message: errorHandler.getErrorMessage(err),
+                status: 412
               });
             } else {
               

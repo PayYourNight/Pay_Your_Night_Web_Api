@@ -12,6 +12,9 @@ module.exports = function (app) {
   app.route("/api/checkin/ativo")
     .get(checkin.getAtivo);
 
+  app.route("/api/checkin/confirmacao")
+    .get(checkin.getAguardandoConfirmacao);   
+
   app.route('/api/checkin/:checkinId') // .all(checkinPolicy.isAllowed)
   .get(checkin.read);
 

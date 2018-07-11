@@ -34,6 +34,10 @@ var CheckinSchema = new Schema({
   ativo: {
     type: Boolean,
     default: true
+  },
+  aguardandoCheckout: {
+    type: Boolean,
+    default: true
   }
 });
 

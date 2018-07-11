@@ -15,6 +15,7 @@ var path = require('path'),
 //Transaction = require('mongoose-transactions');
 
 exports.create = function (req, res) {
+  console.log(res.body);
   var _usuarioId = req.body.usuario_id;
   var _meioPagamentoId = req.body.meiopagamento_id;
   var _origem = req.body.origem;
@@ -25,12 +26,12 @@ exports.create = function (req, res) {
     ativo: 'true'
   }, function (err, checkin) {
     if (err) {
-      return res.status(422).send({
+      return res.status(412).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
       if (!checkin) {
-        return res.status(422).send({
+        return res.status(412).send({
           message: 'Nenhum check-in ativo para este usuário.'
         });
       } else {
@@ -65,15 +66,15 @@ exports.create = function (req, res) {
                     MemoriaCalculo.create(memoriaCalculo, function (err, memoria) {
 
                       if (_usarpyncoin) {
-                        var saldo = 0;
-                        SaldoPontuacao.find({ usuario_id: new mongoose.Type.ObjectId(_usuarioId) }, function (err, saldos) {
-                          console.log(saldos);
+                        var saldoPontos = 0;
+                        SaldoPontuacao.find({ usuario_id: new mongoose.Types.ObjectId(_usuarioId) }, function (err, saldos) {
+                          
                           saldoPontos = getTotalSaldo(saldos);
 
                           var saldoPontuacao = new SaldoPontuacao();
                           saldoPontuacao.usuario_id = _usuarioId;
                           saldoPontuacao.memoriaCalculo_id = memoria._id;
-                          saldoPontuacao.valorMovimentado = saldo * -1;
+                          saldoPontuacao.valorMovimentado = saldoPontos * -1;
                           saldoPontuacao.tipoMovimentacao = 'utilizacao';
                           SaldoPontuacao.create(saldoPontuacao);
                         });
@@ -88,8 +89,11 @@ exports.create = function (req, res) {
                       saldoPontuacao.tipoMovimentacao = 'pagamento';
                       SaldoPontuacao.create(saldoPontuacao, function (err) {
 
-                        res.json(pag);
-
+                        checkin.ativo = false;
+                        checkin.aguardandoCheckout = true;
+                        checkin.save(function (err, checkin) {
+                          res.json(pag);
+                        })                       
                       });
                     });
                   });
@@ -105,6 +109,7 @@ exports.create = function (req, res) {
 function getTotalSaldo(saldos) {
   var total = 0;
   saldos.forEach(function (item) {
+    
     total += item.valorMovimentado;
   });
 
@@ -154,8 +159,7 @@ exports.incluirConsumo = function (req, res) {
   Checkin.findOne({
     usuario_id: _usuarioInclusao,
     ativo: 'true'
-  }, function (err, checkin) {
-    console.log(checkin);
+  }, function (err, checkin) {    
     if (err) {
       return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
@@ -180,8 +184,7 @@ exports.incluirConsumo = function (req, res) {
               usuario_id: _usuarioId,
               ativo: 'true'
             }, function (err, checkinUser) {
-              
-              console.log(checkinUser);
+                            
               if (err) {
                 return res.status(422).send({
                 message: errorHandler.getErrorMessage(err)

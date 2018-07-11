@@ -16,18 +16,18 @@ var path = require('path'),
 exports.create = function(req, res) {
   var checkout = new Checkout(req.body);
 
-  Checkin.find({ usuario_id: new mongoose.ObjectId(checkout.usuario_id) }, function (err, checkin) {
-    checkin.ativo = false;
+  Checkin.find({ usuario_id: new mongoose.Types.ObjectId(checkout.usuario_id) }, function (err, checkin) {
+    checkin.aguardandoCheckout = false;
     Checkin.save(checkin, function (err) {
       if (err) {
-        return res.status(400).send({
+        return res.status(500).send({
           message: errorHandler.getErrorMessage(err)
         });
       } else {
         checkout.checkin_id = checkin._id;
         checkout.save(function (err) {
           if (err) {
-            return res.status(400).send({
+            return res.status(500).send({
               message: errorHandler.getErrorMessage(err)
             });
           } else {

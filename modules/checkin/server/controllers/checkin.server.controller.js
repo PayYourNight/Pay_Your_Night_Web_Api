@@ -131,9 +131,7 @@ exports.getAtivo = function (req, res) {
             message: "Nenhum check-in localizado"
           });
         }
-        else {
-
-          console.log(checkin);
+        else {          
 
           Estabelecimento.findById(new mongoose.Types.ObjectId(checkin.estabelecimento_id), function (err, est) {
             if (err) {
@@ -161,6 +159,29 @@ exports.getAtivo = function (req, res) {
       }
     });
 };
+
+exports.getAguardandoConfirmacao = function (req, res) {
+  var usuario_id = req.query.usuarioid;
+
+  Checkin.findOne({ usuario_id: usuario_id, aguardandoCheckout: true }, function (err, checkin) {
+    if (err) {
+      return res.status(500).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      if (!checkin) {
+        return res.status(404).send({
+          message: "Nenhum check-in localizado"
+        });
+      }
+      else {
+
+        res.json(checkin);
+
+      }
+    }
+  });
+}
 
 exports.checkinByID = function (req, res, next, id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {

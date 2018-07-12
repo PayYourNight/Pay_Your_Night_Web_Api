@@ -15,10 +15,14 @@ var path = require('path'),
  */
 exports.create = function (req, res) {
   console.log(req.body);
-  var checkout = new Checkout(req.body);
+  //var checkout = new Checkout(req.body);
 
-  Checkin.find({ usuario_id: new mongoose.Types.ObjectId(checkout.usuario_id) }, function (err, checkin) {
+  var usuario_id = req.body.usuario_id;
+  var usuarioresp_id = req.body.usuarioresp_id;
+
+  Checkin.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) }, function (err, checkin) {
     if (checkin) {
+      console.log(checkin);
       checkin.aguardandoCheckout = false;
       checkin.save(function (err) {
         if (err) {
@@ -28,6 +32,7 @@ exports.create = function (req, res) {
           });
         } else {
           checkout.checkin_id = checkin._id;
+          checkout.usuarioresp_id = usuarioresp_id;
           checkout.save(function (err) {
             if (err) {
               return res.status(500).send({

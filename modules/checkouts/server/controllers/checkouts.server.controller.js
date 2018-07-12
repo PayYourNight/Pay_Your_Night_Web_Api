@@ -13,31 +13,39 @@ var path = require('path'),
 /**
  * Create a Checkout
  */
-exports.create = function(req, res) {
+exports.create = function (req, res) {
+  console.log(req.body);
   var checkout = new Checkout(req.body);
 
   Checkin.find({ usuario_id: new mongoose.Types.ObjectId(checkout.usuario_id) }, function (err, checkin) {
-    checkin.aguardandoCheckout = false;
-    checkin.save(checkin, function (err) {
-      if (err) {
-        return res.status(500).send({
-          message: errorHandler.getErrorMessage(err),
-          status: 500
-        });
-      } else {
-        checkout.checkin_id = checkin._id;
-        checkout.save(function (err) {
-          if (err) {
-            return res.status(500).send({
-              message: errorHandler.getErrorMessage(err),
-              status: 500
-            });
-          } else {
-            res.jsonp(checkout);
-          }
-        });
-      }
-    });
+    if (checkin) {
+      checkin.aguardandoCheckout = false;
+      checkin.save(checkin, function (err) {
+        if (err) {
+          return res.status(500).send({
+            message: errorHandler.getErrorMessage(err),
+            status: 500
+          });
+        } else {
+          checkout.checkin_id = checkin._id;
+          checkout.save(function (err) {
+            if (err) {
+              return res.status(500).send({
+                message: errorHandler.getErrorMessage(err),
+                status: 500
+              });
+            } else {
+              res.jsonp(checkout);
+            }
+          });
+        }
+      });
+    } else {
+      return res.status(500).send({
+        message: errorHandler.getErrorMessage(err),
+        status: 500
+      });
+    }
   });
 };
 

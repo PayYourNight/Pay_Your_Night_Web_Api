@@ -20,7 +20,7 @@ exports.create = function (req, res) {
   Checkin.find({ usuario_id: new mongoose.Types.ObjectId(checkout.usuario_id) }, function (err, checkin) {
     if (checkin) {
       checkin.aguardandoCheckout = false;
-      checkin.save(checkin, function (err) {
+      checkin.save(function (err) {
         if (err) {
           return res.status(500).send({
             message: errorHandler.getErrorMessage(err),

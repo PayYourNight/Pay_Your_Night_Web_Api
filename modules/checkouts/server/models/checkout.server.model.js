@@ -24,7 +24,7 @@ var CheckoutSchema = new Schema({
   },
   checkin_id: {
     type: Schema.ObjectId,
-    ref: 'User'
+    ref: 'Checkin'
   }
 });
 

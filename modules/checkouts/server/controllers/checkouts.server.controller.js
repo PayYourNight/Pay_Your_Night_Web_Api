@@ -14,7 +14,6 @@ var path = require('path'),
  * Create a Checkout
  */
 exports.create = function (req, res) {
-  console.log(req.body);
   //var checkout = new Checkout(req.body);
 
   var usuario_id = req.body.usuario_id;
@@ -22,9 +21,9 @@ exports.create = function (req, res) {
 
   Checkin.find({ usuario_id: new mongoose.Types.ObjectId(usuario_id) }, function (err, checkin) {
     if (checkin) {
-      console.log(checkin);
-      checkin.aguardandoCheckout = false;
-      checkin.save(function (err) {
+      var ch = new Checkin(checkin);
+      ch.aguardandoCheckout = false;
+      ch.save(function (err) {
         if (err) {
           return res.status(500).send({
             message: errorHandler.getErrorMessage(err),

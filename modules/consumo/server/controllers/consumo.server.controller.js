@@ -146,10 +146,17 @@ exports.getHistorico = function (req, res) {
 exports.getHistoricoDetalhe = function (req, res) {
   var _checkin_id = req.query.checkinid;
 
-  Checkin.findById(_checkin_id, function (err, checkin) {       
-    Consumo.find({ checkin_id: checkin._id }, null, { sort: 'created' } ,function (err, consumos) {   
+  Checkin.findById(_checkin_id, function (err, checkin) {
+    if (checkin) {
+      Consumo.find({ checkin_id: checkin._id }, null, { sort: 'created' }, function (err, consumos) {
         res.json(consumos);
-      });    
+      });
+    } else {
+      return res.status(404).send({
+        message: errorHandler.getErrorMessage(err),
+        status: 404
+      });
+    }
   });
 }
 

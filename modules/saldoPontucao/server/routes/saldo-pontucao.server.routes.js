@@ -5,6 +5,9 @@ module.exports = function(app) {
   app.route('/api/saldo')
     .post(saldo.create);
 
-  app.route('/api/saldo/')
+  app.route('/api/saldo')
     .get(saldo.read);
+
+  app.route('/api/saldos')
+    .get(saldo.list);
 };

@@ -63,5 +63,14 @@ exports.delete = function (req, res) {
  * List of Saldo pontucaos
  */
 exports.list = function (req, res) {
-
+  var usuario_id = req.query.usuarioid;
+  Saldo.find({ usuario_id: usuario_id }, null, { sort: '-created' }, function (err, saldos) {
+    if (err) {
+      return res.status(422).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      res.json(saldos);
+    }
+  });
 };

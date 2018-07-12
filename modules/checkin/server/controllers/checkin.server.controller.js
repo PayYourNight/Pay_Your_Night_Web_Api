@@ -37,17 +37,20 @@ exports.create = function (req, res) {
         message: 'Usuário possui um check-in ativo. '
       });
     } else {
-      checkin = new Checkin(req.body);
-           
-      checkin.estabelecimento_id = _estabelecimentoId;
-      checkin.usuario_id = _userId;
-      checkin.usuarioResp_id = _userRespId;
 
-      var consumo = new Consumo({        
-        usuarioResp_id: _userRespId
+      Estabelecimento.findById(_estabelecimentoId, function (err, est) {
+        checkin = new Checkin(req.body);
+        checkin.estabelecimento_id = est._id;
+        checkin.estabelecimento_nome = est.nome;
+        checkin.usuario_id = _userId;
+        checkin.usuarioResp_id = _userRespId;
+
+        var consumo = new Consumo({
+          usuarioResp_id: _userRespId
+        });
+
+        start(checkin, consumo, res);
       });
-
-      start(checkin, consumo, res);
     }
   });
 };
@@ -62,12 +65,13 @@ async function start (checkin, consumo, res) {
       res.json(checkin);
       // expect(final[0].name).toBe('Jonathan')
   } catch (error) {      
-      const rollbackObj = await transaction.rollback().catch(console.error)
-      transaction.clean()
-      res.status(422)
+    const rollbackObj = await transaction.rollback().catch(console.error);
+    transaction.clean();
+    res.status(500)
       .send({
-               message: errorHandler.getErrorMessage(err)
-           });
+        message: errorHandler.getErrorMessage(error),
+        status: 500
+      });
   }
 }
 

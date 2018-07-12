@@ -20,6 +20,9 @@ var CheckinSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Estabelecimento'
   },
+  estabelecimento_nome: {
+    type: String
+  },
   consumos_incluidos: [{
     usuario_id: String
   }],

@@ -10,12 +10,12 @@ var path = require('path'),
   Parametros = mongoose.model('Parametros'),
   SaldoPontuacao = mongoose.model('SaldoPontuacao'),
   Usuario = mongoose.model('User'),
+  Estabeleciemento = mongoose.model('Estabelecimento'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 //Transaction = require('mongoose-transactions');
 
-exports.create = function (req, res) {
-  console.log(res.body);
+exports.create = function (req, res) {  
   var _usuarioId = req.body.usuario_id;
   var _meioPagamentoId = req.body.meiopagamento_id;
   var _origem = req.body.origem;
@@ -41,67 +41,72 @@ exports.create = function (req, res) {
           checkin_id: checkin._id
         }, function (err, consumos) {
 
-          var pagamento = new Pagamento({
-            usuario_id: _usuarioId,
-            meioPagamento_id: new mongoose.Types.ObjectId(_meioPagamentoId),
-            checkin_id: checkin._id,
-            discriminator: _origem === 'app' ? 'pagamentoApp' : 'pagamentoCaixa',
-            formaPagamento: 'credito',
-            valorTotal: somarConsumos(consumos)
-          });
-          
-          Pagamento.create(pagamento, function (err, pag) {
-            if (err) {
-              return res.status(412).send({
-                message: errorHandler.getErrorMessage(err),
-                status: 412
-              });
-            } else {
-              
-              if (pag.discriminator === 'pagamentoApp') {
+          Estabeleciemento.findById(checkin.estabelecimento_id, function (err, est) {
 
-                Parametros.findOne({})
-                  .exec(function (err, param) {
-                    var memoriaCalculo = new MemoriaCalculo();
-                    memoriaCalculo.pagamento_id = pag._id;
-                    memoriaCalculo.taxaConversaoPagamentoCredito = param.taxaConversaoPagamentoCredito;
-                    memoriaCalculo.percentualTransacao = param.percentualTransacao;
-                    MemoriaCalculo.create(memoriaCalculo, function (err, memoria) {
+            var pagamento = new Pagamento({
+              usuario_id: _usuarioId,
+              estabelecimento_id: est._id,
+              estabelecimento_nome: est.nome,
+              meioPagamento_id: new mongoose.Types.ObjectId(_meioPagamentoId),              
+              checkin_id: checkin._id,
+              discriminator: _origem === 'app' ? 'pagamentoApp' : 'pagamentoCaixa',
+              formaPagamento: 'credito',
+              valorTotal: somarConsumos(consumos)
+            });
 
-                      if (_usarpyncoin) {
-                        var saldoPontos = 0;
-                        SaldoPontuacao.find({ usuario_id: new mongoose.Types.ObjectId(_usuarioId) }, function (err, saldos) {
-                          
-                          saldoPontos = getTotalSaldo(saldos);
+            Pagamento.create(pagamento, function (err, pag) {
+              if (err) {
+                return res.status(412).send({
+                  message: errorHandler.getErrorMessage(err),
+                  status: 412
+                });
+              } else {
 
-                          var saldoPontuacao = new SaldoPontuacao();
-                          saldoPontuacao.usuario_id = _usuarioId;
-                          saldoPontuacao.memoriaCalculo_id = memoria._id;
-                          saldoPontuacao.valorMovimentado = saldoPontos * -1;
-                          saldoPontuacao.tipoMovimentacao = 'utilizacao';
-                          SaldoPontuacao.create(saldoPontuacao);
+                if (pag.discriminator === 'pagamentoApp') {
+
+                  Parametros.findOne({})
+                    .exec(function (err, param) {
+                      var memoriaCalculo = new MemoriaCalculo();
+                      memoriaCalculo.pagamento_id = pag._id;
+                      memoriaCalculo.taxaConversaoPagamentoCredito = param.taxaConversaoPagamentoCredito;
+                      memoriaCalculo.percentualTransacao = param.percentualTransacao;
+                      MemoriaCalculo.create(memoriaCalculo, function (err, memoria) {
+
+                        if (_usarpyncoin) {
+                          var saldoPontos = 0;
+                          SaldoPontuacao.find({ usuario_id: new mongoose.Types.ObjectId(_usuarioId) }, function (err, saldos) {
+
+                            saldoPontos = getTotalSaldo(saldos);
+
+                            var saldoPontuacao = new SaldoPontuacao();
+                            saldoPontuacao.usuario_id = _usuarioId;
+                            saldoPontuacao.memoriaCalculo_id = memoria._id;
+                            saldoPontuacao.valorMovimentado = saldoPontos * -1;
+                            saldoPontuacao.tipoMovimentacao = 'utilizacao';
+                            SaldoPontuacao.create(saldoPontuacao);
+                          });
+                        }
+
+                        var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
+
+                        var saldoPontuacao = new SaldoPontuacao();
+                        saldoPontuacao.usuario_id = _usuarioId;
+                        saldoPontuacao.memoriaCalculo_id = memoria._id;
+                        saldoPontuacao.valorMovimentado = saldo;
+                        saldoPontuacao.tipoMovimentacao = 'pagamento';
+                        SaldoPontuacao.create(saldoPontuacao, function (err) {
+
+                          checkin.ativo = false;
+                          checkin.aguardandoCheckout = true;
+                          checkin.save(function (err, checkin) {
+                            res.json(pag);
+                          })
                         });
-                      }
-
-                      var saldo = pagamento.valorTotal * param.taxaConversaoPagamentoCredito;
-
-                      var saldoPontuacao = new SaldoPontuacao();
-                      saldoPontuacao.usuario_id = _usuarioId;
-                      saldoPontuacao.memoriaCalculo_id = memoria._id;
-                      saldoPontuacao.valorMovimentado = saldo;
-                      saldoPontuacao.tipoMovimentacao = 'pagamento';
-                      SaldoPontuacao.create(saldoPontuacao, function (err) {
-
-                        checkin.ativo = false;
-                        checkin.aguardandoCheckout = true;
-                        checkin.save(function (err, checkin) {
-                          res.json(pag);
-                        })                       
                       });
                     });
-                  });
+                }
               }
-            }
+            });
           });
         });
       }

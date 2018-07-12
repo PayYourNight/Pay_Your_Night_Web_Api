@@ -9,7 +9,7 @@ var PagamentoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  usuario: {
+  usuario_id: {
     type: Schema.ObjectId,
     ref: 'User'
   },
@@ -17,9 +17,16 @@ var PagamentoSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'User'
   },
-  estabelecimento: {
+  estabelecimento_id: {
     type: Schema.ObjectId,
     ref: 'Estabelecimento'
+  },
+  estabelecimento_nome: {
+    type: String    
+  },
+  checkin_id: {
+    type: Schema.ObjectId,
+    ref: 'Checkin'
   },
   consumo: {
     type: Schema.ObjectId,

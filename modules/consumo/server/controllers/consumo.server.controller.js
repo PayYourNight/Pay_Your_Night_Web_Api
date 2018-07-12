@@ -8,7 +8,9 @@ var path = require('path'),
   Checkin = mongoose.model('Checkin'),
   Consumo = mongoose.model('Consumo'),
   Produto = mongoose.model('Produto'),
-  ProdutoConsumo = mongoose.model('ProdutoConsumo'),
+  Estabelecimento = mongoose.model('Estabelecimento'),
+  Pagamento = mongoose.model('Pagamento'),
+  ProdutoConsumo = mongoose.model('ProdutoConsumo'),  
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   _ = require('lodash');
 
@@ -19,15 +21,6 @@ exports.create = function (req, res) {
   var _usuarioId = req.body.usuario_id;  
   var _produtosConsumo = req.body.produtosConsumo;
   var _usuarioresp_id = req.body.usuarioresp_id;
-
-  console.log(req.body);
-
-  //console.log(_usuarioId);
-  //console.log('----------');
-  //console.log(_produtosConsumo);
-  //console.log('----------');
-  //console.log(_usuarioresp_id);
-  //console.log('----------');
   
   Checkin.findOne({
     usuario_id: new mongoose.Types.ObjectId(_usuarioId),
@@ -129,3 +122,63 @@ exports.list = function (req, res) {
     }
   });
 };
+
+exports.getHistorico = function (req, res) {
+  var usuario_id = req.query.usuarioid;
+
+  Pagamento.find({ usuario_id: usuario_id }, null, { sort: '-created' }, function (err, pags) {
+    if (err) {
+
+      return res.status(500).send({
+        message: errorHandler.getErrorMessage(err),
+        status: 500
+      });
+
+    } else {
+
+      res.json(pags);
+
+    }
+  });
+
+}
+
+exports.getHistoricoDetalhe = function (req, res) {
+  var _checkin_id = req.query.checkinid;
+
+  Checkin.findById(_checkin_id, function (err, checkin) {       
+    Consumo.find({ checkin_id: checkin._id }, null, { sort: 'created' } ,function (err, consumos) {   
+        res.json(consumos);
+      });    
+  });
+}
+
+
+
+
+
+//function task(pags) {
+//  return new Promise(function (resolve, reject) {
+//    console.log("começou");
+//    pags.forEach(function (item) {
+//      Estabelecimento.findById(item.estabelecimento_id, function (error, est) {
+//        if (error) {
+//          reject(err);
+//        }
+//        else {
+//          if (est) {
+//            Consumo.estabelecimento_nome = est.nome;
+//          }          
+//        }
+//      });
+
+//      resolve(pags);
+
+//      //setTimeout(function () {
+//      //  console.log("terminou");
+//      //  resolve(pags);
+//      //}, 4000);
+
+//    });
+//  });
+//}

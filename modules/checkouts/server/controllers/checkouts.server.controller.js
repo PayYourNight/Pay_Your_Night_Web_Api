@@ -30,6 +30,7 @@ exports.create = function (req, res) {
             status: 500
           });
         } else {
+          var checkout = new Checkout();
           checkout.checkin_id = checkin._id;
           checkout.usuarioresp_id = usuarioresp_id;
           checkout.save(function (err) {
